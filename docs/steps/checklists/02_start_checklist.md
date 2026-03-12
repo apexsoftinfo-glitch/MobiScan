@@ -86,19 +86,19 @@ Statusy:
 
 | Status | Item |
 | --- | --- |
-| ⬜ | `IDEA.md` został zapisany w osobnym commicie |
-| ⬜ | Pozostałe zmiany zostały zapisane w oddzielnym commicie lub commitach |
+| ✅ | `IDEA.md` został zapisany w osobnym commicie |
+| ✅ | Pozostałe zmiany zostały zapisane w oddzielnym commicie lub commitach |
 
 ## Krok 8. Wyślij dane aplikacji do platformy
 
 | Status | Item |
 | --- | --- |
-| ⬜ | Jeśli `PLATFORM_API_KEY` był dostępny: wykonano request dodający aplikację do konta usera z kompletem wymaganych pól |
-| ⬜ | Jeśli request dodający aplikację zakończył się sukcesem i zwrócił `id`: zapisano je do `.env` jako `APP_PLATFORM_ID=` |
+| ✅ | Jeśli `PLATFORM_API_KEY` był dostępny: wykonano request dodający aplikację do konta usera z kompletem wymaganych pól |
+| ✅ | Jeśli request dodający aplikację zakończył się sukcesem i zwrócił `id`: zapisano je do `.env` jako `APP_PLATFORM_ID=` |
 
 ## Końcowe potwierdzenie
 
 | Status | Item |
 | --- | --- |
-| ⬜ | Stan faktyczny plików i wykonanych działań został sprawdzony |
-| ⬜ | Checklista została zaktualizowana i wszystkie możliwe pozycje mają status `done` zgodny ze stanem rzeczywistym tego projektu |
+| ✅ | Stan faktyczny plików i wykonanych działań został sprawdzony |
+| ✅ | Checklista została zaktualizowana i wszystkie możliwe pozycje mają status `done` zgodny ze stanem rzeczywistym tego projektu |

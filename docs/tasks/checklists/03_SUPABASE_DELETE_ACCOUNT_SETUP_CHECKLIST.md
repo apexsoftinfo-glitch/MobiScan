@@ -11,8 +11,8 @@ Statusy:
 
 | Status | Item |
 | --- | --- |
-| ⬜ | Agent ma działający dostęp do projektu przez `Supabase MCP` |
-| ⬜ | Jeśli brak MCP: user dostał instrukcję uruchomienia `docs/tasks/01_INITIALIZE_APP_SETUP.md` |
+| ✅ | Agent ma działający dostęp do projektu przez `Supabase MCP` |
+| ✅ | Jeśli brak MCP: user dostał instrukcję uruchomienia `docs/tasks/01_INITIALIZE_APP_SETUP.md` |
 
 ## Krok 2. Sprawdź aktualny stan repo i projektu
 
