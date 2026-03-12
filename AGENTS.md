@@ -122,7 +122,7 @@ Na ekranach mobilnych respektuj `SafeArea`.
 # Supabase
 
 Ten projekt Flutter działa w jednym wspólnym projekcie Supabase razem z innymi aplikacjami.
-Każda nowa tabela specyficzna dla tej aplikacji musi mieć prefix `<app_prefix>_`, np. `<app_prefix>_tasks`.
+Każda nowa tabela specyficzna dla tej aplikacji musi mieć prefix `mobiscan__`, np. `mobiscan__tasks`.
 Jeśli używasz `Supabase`, logika `Supabase` ma być w `Data Source`.
 Wyjątek: bootstrap aplikacji i DI mogą inicjalizować klienta `Supabase`.
 Dla tabel używanych w `Stream` włącz `RLS` i utwórz odpowiednie policies.

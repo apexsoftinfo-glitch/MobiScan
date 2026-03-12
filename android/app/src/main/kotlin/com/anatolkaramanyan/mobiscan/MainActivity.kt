@@ -1,4 +1,4 @@
-package com.example.12apps
+package com.anatolkaramanyan.mobiscan
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
