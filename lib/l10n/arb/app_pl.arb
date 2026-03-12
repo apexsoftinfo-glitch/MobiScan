@@ -160,5 +160,17 @@
   "accountDeletedSnackbar": "Konto usunięte",
   "deleteAccountDialogTitle": "Usuń konto?",
   "deleteAccountDialogBody": "Czy na pewno chcesz usunąć swoje konto? Tej operacji nie można cofnąć.",
-  "cancelButtonLabel": "Anuluj"
+  "cancelButtonLabel": "Anuluj",
+  "addScanButtonLabel": "Dodaj skan",
+  "noScansTitle": "Brak skanów",
+  "noScansBody": "Kliknij przycisk poniżej, aby rozpocząć skanowanie.",
+  "searchScansPlaceholder": "Szukaj skanów...",
+  "documentDetailsTitle": "Szczegóły",
+  "renameDocumentDialogTitle": "Zmień nazwę",
+  "exportPdfButtonLabel": "Udostępnij PDF",
+  "savingLabel": "Zapisywanie...",
+  "generatingPdfLabel": "Generowanie PDF...",
+  "noPagesError": "Dokument nie ma stron.",
+  "documentRenamedSnackbar": "Nazwa zmieniona",
+  "errorUnknownKey": "Nieznany błąd"
 }

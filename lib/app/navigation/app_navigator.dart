@@ -7,6 +7,8 @@ import '../ui/delete_account_setup_required_screen.dart';
 import '../../features/auth/presentation/ui/login_screen.dart';
 import '../../features/auth/presentation/ui/register_screen.dart';
 import '../../features/profiles/presentation/ui/profile_screen.dart';
+import '../../features/documents/models/document_model.dart';
+import '../../features/documents/presentation/ui/document_detail_screen.dart';
 
 abstract final class AppNavigator {
   static Future<T?> goToLogin<T>(BuildContext context) {
@@ -57,6 +59,17 @@ abstract final class AppNavigator {
     return Navigator.of(context).push(
       MaterialPageRoute<T>(
         builder: (_) => const DeleteAccountSetupRequiredScreen(),
+      ),
+    );
+  }
+
+  static Future<T?> goToDocumentDetail<T>(BuildContext context, DocumentModel document) {
+    return Navigator.of(context).push(
+      MaterialPageRoute<T>(
+        builder: (_) => BlocProvider<SessionCubit>.value(
+          value: context.read<SessionCubit>(),
+          child: DocumentDetailScreen(document: document),
+        ),
       ),
     );
   }

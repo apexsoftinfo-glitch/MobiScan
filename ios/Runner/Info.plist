@@ -63,5 +63,7 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Aplikacja MobiScan potrzebuje dostępu do aparatu, aby skanować dokumenty.</string>
 </dict>
 </plist>

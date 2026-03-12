@@ -795,6 +795,78 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Anuluj'**
   String get cancelButtonLabel;
+
+  /// No description provided for @addScanButtonLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodaj skan'**
+  String get addScanButtonLabel;
+
+  /// No description provided for @noScansTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak skanów'**
+  String get noScansTitle;
+
+  /// No description provided for @noScansBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kliknij przycisk poniżej, aby rozpocząć skanowanie.'**
+  String get noScansBody;
+
+  /// No description provided for @searchScansPlaceholder.
+  ///
+  /// In pl, this message translates to:
+  /// **'Szukaj skanów...'**
+  String get searchScansPlaceholder;
+
+  /// No description provided for @documentDetailsTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Szczegóły'**
+  String get documentDetailsTitle;
+
+  /// No description provided for @renameDocumentDialogTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmień nazwę'**
+  String get renameDocumentDialogTitle;
+
+  /// No description provided for @exportPdfButtonLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Udostępnij PDF'**
+  String get exportPdfButtonLabel;
+
+  /// No description provided for @savingLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisywanie...'**
+  String get savingLabel;
+
+  /// No description provided for @generatingPdfLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Generowanie PDF...'**
+  String get generatingPdfLabel;
+
+  /// No description provided for @noPagesError.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dokument nie ma stron.'**
+  String get noPagesError;
+
+  /// No description provided for @documentRenamedSnackbar.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nazwa zmieniona'**
+  String get documentRenamedSnackbar;
+
+  /// No description provided for @errorUnknownKey.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nieznany błąd'**
+  String get errorUnknownKey;
 }
 
 class _AppLocalizationsDelegate

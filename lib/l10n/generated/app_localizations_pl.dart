@@ -403,4 +403,41 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get cancelButtonLabel => 'Anuluj';
+
+  @override
+  String get addScanButtonLabel => 'Dodaj skan';
+
+  @override
+  String get noScansTitle => 'Brak skanów';
+
+  @override
+  String get noScansBody =>
+      'Kliknij przycisk poniżej, aby rozpocząć skanowanie.';
+
+  @override
+  String get searchScansPlaceholder => 'Szukaj skanów...';
+
+  @override
+  String get documentDetailsTitle => 'Szczegóły';
+
+  @override
+  String get renameDocumentDialogTitle => 'Zmień nazwę';
+
+  @override
+  String get exportPdfButtonLabel => 'Udostępnij PDF';
+
+  @override
+  String get savingLabel => 'Zapisywanie...';
+
+  @override
+  String get generatingPdfLabel => 'Generowanie PDF...';
+
+  @override
+  String get noPagesError => 'Dokument nie ma stron.';
+
+  @override
+  String get documentRenamedSnackbar => 'Nazwa zmieniona';
+
+  @override
+  String get errorUnknownKey => 'Nieznany błąd';
 }
