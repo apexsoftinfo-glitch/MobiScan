@@ -85,6 +85,13 @@ class _ProfileViewState extends State<_ProfileView> {
               ).showSnackBar(SnackBar(content: Text(l10n.proEnabledSnackbar)));
               context.read<AccountActionsCubit>().clearFeedback();
             }
+
+            if (state.successKey == 'account_deleted') {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.accountDeletedSnackbar)),
+              );
+              context.read<AccountActionsCubit>().clearFeedback();
+            }
           },
         ),
       ],
@@ -276,12 +283,19 @@ class _ProfileViewState extends State<_ProfileView> {
                                   onPressed:
                                       !isSavingName &&
                                           activeAccountAction == null
-                                      ? () =>
-                                            AppNavigator.goToDeleteAccountSetup(
-                                              context,
-                                            )
+                                      ? () => _confirmDeleteAccount(context)
                                       : null,
-                                  child: Text(l10n.deleteAccountButtonLabel),
+                                  child:
+                                      activeAccountAction ==
+                                              AccountAction.deleteAccount
+                                          ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                          : Text(l10n.deleteAccountButtonLabel),
                                 ),
                                 if (kDebugMode) ...[
                                   const SizedBox(height: 12),
@@ -338,6 +352,36 @@ class _ProfileViewState extends State<_ProfileView> {
 
     return result ?? false;
   }
+  Future<void> _confirmDeleteAccount(BuildContext context) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text(l10n.deleteAccountDialogTitle),
+            content: Text(l10n.deleteAccountDialogBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(l10n.cancelButtonLabel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                  foregroundColor: Theme.of(context).colorScheme.onError,
+                ),
+                child: Text(l10n.deleteAccountButtonLabel),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      context.read<AccountActionsCubit>().deleteAccount();
+    }
+  }
+
 
   void _saveFirstName(BuildContext context, SessionState session) {
     final userId = session.userIdOrNull;

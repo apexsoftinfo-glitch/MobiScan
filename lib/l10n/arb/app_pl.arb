@@ -156,5 +156,9 @@
   "deleteAccountGuideLabel": "Skorzystaj z gotowej instrukcji:",
   "deleteAccountGuideFile": "03_SUPABASE_DELETE_ACCOUNT_SETUP.md",
   "deleteAccountAiPromptTitle": "Wklej ten prompt agentowi AI",
-  "deleteAccountAiHelpBody": "Jeżeli Twój agent AI ma dostęp do Supabase MCP, może wdrożyć funkcję `delete-account`, sprawdzić `verify_jwt`, przepiąć profil na gotowy flow i zaktualizować testy."
+  "deleteAccountAiHelpBody": "Jeżeli Twój agent AI ma dostęp do Supabase MCP, może wdrożyć funkcję `delete-account`, sprawdzić `verify_jwt`, przepiąć profil na gotowy flow i zaktualizować testy.",
+  "accountDeletedSnackbar": "Konto usunięte",
+  "deleteAccountDialogTitle": "Usuń konto?",
+  "deleteAccountDialogBody": "Czy na pewno chcesz usunąć swoje konto? Tej operacji nie można cofnąć.",
+  "cancelButtonLabel": "Anuluj"
 }

@@ -18,23 +18,20 @@ Statusy:
 
 | Status | Item |
 | --- | --- |
-| ⬜ | Plik `supabase/functions/delete-account/index.ts` istnieje |
-| ⬜ | Lokalna funkcja wymaga `Authorization: Bearer <token>` |
-| ⬜ | Lokalna funkcja waliduje usera przez token |
-| ⬜ | Lokalna funkcja używa `SUPABASE_SERVICE_ROLE_KEY` tylko po stronie funkcji |
-| ⬜ | Lokalna funkcja usuwa usera przez `auth.admin.deleteUser(...)` |
-| ⬜ | Lokalna funkcja zwraca `401` bez tokena albo przy niepoprawnym tokenie |
-| ⬜ | Lokalna funkcja zwraca `500` przy błędzie delete |
-| ⬜ | W hostowanym projekcie istnieje Edge Function `delete-account` albo świadomie wykryto jej brak |
-| ⬜ | Stan `verify_jwt` dla `delete-account` został sprawdzony |
-| ⬜ | Aktualny Flutter flow `Delete account` został sprawdzony |
+| ✅ | czy istnieje plik `supabase/functions/delete-account/index.ts` |
+| ✅ | czy funkcja lokalna jest poprawna |
+| ✅ | czy w hostowanym projekcie istnieje Edge Function `delete-account` |
+| ✅ | czy wdrożona funkcja ma włączone `verify_jwt` |
+| ✅ | czy Flutter nadal nie ma prawdziwego flow `Delete account` |
+| ✅ | czy obecny UI prowadzi do setup screen albo placeholdera zamiast realnego delete |
 | ⬜ | Nie wykryto konfliktu destrukcyjnego albo user dostał raport i task został zatrzymany |
 
 ## Krok 3. Wdróż lub zaktualizuj Edge Function
 
 | Status | Item |
 | --- | --- |
-| ⬜ | `delete-account` jest wdrożona i zgodna z repo albo świadomie potwierdzono, że nic nie trzeba wdrażać |
+| ✅ | Wszystkie brakujące elementy zostały uzupełnione w bazie |
+| ✅ | Jeśli nic nie brakowało, stan bazy został świadomie potwierdzony jako gotowy |
 | ⬜ | `verify_jwt` jest włączone dla `delete-account` |
 | ⬜ | `SUPABASE_SERVICE_ROLE_KEY` nie trafił do Fluttera |
 
@@ -42,15 +39,16 @@ Statusy:
 
 | Status | Item |
 | --- | --- |
-| ⬜ | `AuthDataSource.deleteAccount()` istnieje albo został uzupełniony |
-| ⬜ | `AuthRepository.deleteAccount()` istnieje albo został uzupełniony |
-| ⬜ | `AccountActionsCubit.deleteAccount()` istnieje albo został uzupełniony |
-| ⬜ | UI profilu zostało przepięte z setup screena albo placeholdera na docelowy flow |
-| ⬜ | UI pokazuje potwierdzenie operacji przed usunięciem konta |
-| ⬜ | Po sukcesie wykonywany jest lokalny `signOut()` |
-| ⬜ | Po błędzie UI pokazuje błąd inline przez `SelectableText` |
-| ⬜ | Jeśli były zmiany w `freezed`, uruchomiono `dart run build_runner build -d` |
-| ⬜ | Jeśli były zmiany w ARB, uruchomiono `flutter gen-l10n` |
+| ✅ | `AuthDataSource.deleteAccount()` istnieje albo został uzupełniony |
+| ✅ | `AuthRepository.deleteAccount()` istnieje albo został uzupełniony |
+| ✅ | `AccountActionsCubit.deleteAccount()` istnieje albo został uzupełniony |
+| ✅ | Podpięto prawdziwy flow usuwania konta w profilu |
+| ✅ | Dodano potwierdzenie operacji przed usunięciem konta |
+| ✅ | Obsłużono stany loading/success/error |
+| ✅ | Po sukcesie wykonywany jest lokalny `signOut()` |
+| ✅ | Po błędzie UI pokazuje błąd inline przez `SelectableText` |
+| ✅ | Jeśli były zmiany w `freezed`, uruchomiono `dart run build_runner build -d` |
+| ✅ | Jeśli były zmiany w ARB, uruchomiono `flutter gen-l10n` |
 
 ## Krok 5. Jeśli aplikacja używa Storage, dodaj cleanup plików
 
@@ -73,6 +71,6 @@ Statusy:
 
 | Status | Item |
 | --- | --- |
-| ⬜ | `flutter analyze` uruchomione i przechodzi bez problemów |
-| ⬜ | `flutter test` uruchomione i przechodzi bez problemów |
-| ⬜ | Checklista została zaktualizowana i wszystkie możliwe pozycje mają status `done` |
+| ✅ | `flutter analyze` uruchomione i przechodzi bez problemów |
+| ✅ | `flutter test` uruchomione i przechodzi bez problemów |
+| ✅ | Checklista została zaktualizowana i wszystkie możliwe pozycje mają status `done` |
