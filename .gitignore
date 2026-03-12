@@ -1,0 +1,36 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+ios/.generated/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/App.framework
+ios/Flutter/App.podspec
+ios/Flutter/Engine.framework
+ios/Runner/GeneratedPluginRegistrant.h
+ios/Runner/GeneratedPluginRegistrant.m
+lib/generated_plugin_registrant.dart
+pubspec-overrides.yaml
+
+# Sensitive config files (Step 01 requirement)
+.env
+config/api-keys.json
+android/key.properties
+.codex/
+.mcp.json
+opencode.json
+*.p12
+*.keystore
+*.jks
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.iws
+
+# OS
+.DS_Store
