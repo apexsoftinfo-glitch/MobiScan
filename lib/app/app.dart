@@ -27,7 +27,6 @@ class App extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF6366F1),
           brightness: Brightness.dark,
-          background: const Color(0xFF0D0D12),
           surface: const Color(0xFF1C1C23),
         ),
         appBarTheme: const AppBarTheme(

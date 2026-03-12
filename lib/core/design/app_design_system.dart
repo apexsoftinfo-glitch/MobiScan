@@ -34,10 +34,10 @@ class AppDesignSystem {
         filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
         child: Container(
           decoration: BoxDecoration(
-            color: color.withOpacity(opacity),
+            color: color.withValues(alpha: opacity),
             borderRadius: borderRadius,
             border: Border.all(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               width: 0.5,
             ),
           ),

@@ -115,7 +115,7 @@ class _DocumentDetailView extends StatelessWidget {
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppDesignSystem.secondary.withOpacity(0.05),
+                color: AppDesignSystem.secondary.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -154,7 +154,7 @@ class _DocumentDetailView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: AppDesignSystem.primary.withOpacity(0.3),
+                            color: AppDesignSystem.primary.withValues(alpha: 0.3),
                             blurRadius: 15,
                             offset: const Offset(0, 8),
                           ),
@@ -214,7 +214,7 @@ class _DocumentDetailView extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: l10n.searchScansPlaceholder,
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.05),
+                    fillColor: Colors.white.withValues(alpha: 0.05),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                   ),
                 ),
@@ -290,10 +290,10 @@ class _PageThumbnail extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 0.5),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),

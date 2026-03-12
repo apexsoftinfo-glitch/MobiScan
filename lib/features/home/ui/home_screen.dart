@@ -67,7 +67,7 @@ class HomeScreen extends StatelessWidget {
                       center: Alignment.topRight,
                       radius: 1.5,
                       colors: [
-                        AppDesignSystem.primary.withOpacity(0.1),
+                        AppDesignSystem.primary.withValues(alpha: 0.1),
                         Colors.transparent,
                       ],
                     ),
@@ -113,7 +113,7 @@ class HomeScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(28),
                   boxShadow: [
                     BoxShadow(
-                      color: AppDesignSystem.primary.withOpacity(0.3),
+                      color: AppDesignSystem.primary.withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -155,7 +155,7 @@ class _NoScansView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppDesignSystem.primary.withOpacity(0.1),
+                color: AppDesignSystem.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.description_outlined, size: 64, color: AppDesignSystem.primary),
@@ -217,7 +217,7 @@ class _DocumentCard extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: AppDesignSystem.primary.withOpacity(0.15),
+                  color: AppDesignSystem.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.article_rounded, color: AppDesignSystem.primary),
