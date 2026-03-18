@@ -82,11 +82,19 @@ class SupabaseAuthDataSource implements AuthDataSource {
       'ℹ️ [AuthDataSource] upgradeAnonymousWithEmail started email=$email',
     );
     try {
-      await _supabaseClient.auth.updateUser(
-        UserAttributes(email: email, password: password),
+      final session = _supabaseClient.auth.currentSession;
+      await _supabaseClient.functions.invoke(
+        'upgrade-guest-instant',
+        body: {
+          'email': email,
+          'password': password,
+        },
+        headers: {
+          'Authorization': 'Bearer ${session?.accessToken}',
+        },
       );
       debugPrint(
-        '✅ [AuthDataSource] upgradeAnonymousWithEmail succeeded email=$email',
+        '✅ [AuthDataSource] upgradeAnonymousWithEmail (instant) succeeded email=$email',
       );
     } catch (error) {
       debugPrint('❌ [AuthDataSource] upgradeAnonymousWithEmail error: $error');
