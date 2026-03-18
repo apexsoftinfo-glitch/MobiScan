@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../data/repositories/document_repository.dart';
 import '../../data/services/document_scanner_service.dart';
 
@@ -31,6 +32,19 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
   Future<void> startScan(String userId) async {
     emit(const DocumentScannerState.scanning());
     try {
+      // Explicitly check for camera permission
+      final status = await Permission.camera.request();
+      if (status.isPermanentlyDenied) {
+        openAppSettings();
+        emit(const DocumentScannerState.error(errorKey: 'permission_denied'));
+        return;
+      }
+      
+      if (!status.isGranted) {
+        emit(const DocumentScannerState.error(errorKey: 'permission_denied'));
+        return;
+      }
+
       final images = await _scannerService.getPictures();
       if (images == null || images.isEmpty) {
         emit(const DocumentScannerState.initial());
@@ -46,9 +60,7 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
         name: 'Scan $timestamp',
       );
 
-      // Add pages (in real app we should upload to storage, 
-      // but for MVP let's assume storage_path is local or placeholder)
-      // Actually, per IDEA.md we should store them.
+      // Add pages
       for (var i = 0; i < images.length; i++) {
         await _documentRepository.addPage(
           documentId: doc.id,

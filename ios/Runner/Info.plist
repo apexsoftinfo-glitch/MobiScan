@@ -17,6 +17,8 @@
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>pl</string>
+		<string>en</string>
+		<string>ru</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>MobiScan</string>
@@ -65,5 +67,11 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Aplikacja MobiScan potrzebuje dostępu do aparatu, aby skanować dokumenty.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Aplikacja MobiScan potrzebuje dostępu do galerii, aby zapisywać skany.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Aplikacja MobiScan potrzebuje uprawnień do dodawania zdjęć do galerii.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Dostęp do mikrofonu (wymagany przez niektóre biblioteki systemowe skanera).</string>
 </dict>
 </plist>
