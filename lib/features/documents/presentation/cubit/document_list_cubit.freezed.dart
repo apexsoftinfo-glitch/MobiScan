@@ -14,30 +14,62 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DocumentListState {
 
-
+ String get searchQuery; DocumentSortOrder get sortOrder;
+/// Create a copy of DocumentListState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$DocumentListStateCopyWith<DocumentListState> get copyWith => _$DocumentListStateCopyWithImpl<DocumentListState>(this as DocumentListState, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DocumentListState);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DocumentListState&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,searchQuery,sortOrder);
 
 @override
 String toString() {
-  return 'DocumentListState()';
+  return 'DocumentListState(searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 
 
 }
 
 /// @nodoc
-class $DocumentListStateCopyWith<$Res>  {
-$DocumentListStateCopyWith(DocumentListState _, $Res Function(DocumentListState) __);
+abstract mixin class $DocumentListStateCopyWith<$Res>  {
+  factory $DocumentListStateCopyWith(DocumentListState value, $Res Function(DocumentListState) _then) = _$DocumentListStateCopyWithImpl;
+@useResult
+$Res call({
+ String searchQuery, DocumentSortOrder sortOrder
+});
+
+
+
+
+}
+/// @nodoc
+class _$DocumentListStateCopyWithImpl<$Res>
+    implements $DocumentListStateCopyWith<$Res> {
+  _$DocumentListStateCopyWithImpl(this._self, this._then);
+
+  final DocumentListState _self;
+  final $Res Function(DocumentListState) _then;
+
+/// Create a copy of DocumentListState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? searchQuery = null,Object? sortOrder = null,}) {
+  return _then(_self.copyWith(
+searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as String,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
+as DocumentSortOrder,
+  ));
+}
+
 }
 
 
@@ -125,13 +157,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<DocumentModel> documents)?  success,TResult Function( String errorKey)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String searchQuery,  DocumentSortOrder sortOrder)?  initial,TResult Function( String searchQuery,  DocumentSortOrder sortOrder)?  loading,TResult Function( List<DocumentModel> documents,  String searchQuery,  DocumentSortOrder sortOrder)?  success,TResult Function( String errorKey,  String searchQuery,  DocumentSortOrder sortOrder)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case Initial() when initial != null:
-return initial();case Loading() when loading != null:
-return loading();case Success() when success != null:
-return success(_that.documents);case Error() when error != null:
-return error(_that.errorKey);case _:
+return initial(_that.searchQuery,_that.sortOrder);case Loading() when loading != null:
+return loading(_that.searchQuery,_that.sortOrder);case Success() when success != null:
+return success(_that.documents,_that.searchQuery,_that.sortOrder);case Error() when error != null:
+return error(_that.errorKey,_that.searchQuery,_that.sortOrder);case _:
   return orElse();
 
 }
@@ -149,13 +181,13 @@ return error(_that.errorKey);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<DocumentModel> documents)  success,required TResult Function( String errorKey)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String searchQuery,  DocumentSortOrder sortOrder)  initial,required TResult Function( String searchQuery,  DocumentSortOrder sortOrder)  loading,required TResult Function( List<DocumentModel> documents,  String searchQuery,  DocumentSortOrder sortOrder)  success,required TResult Function( String errorKey,  String searchQuery,  DocumentSortOrder sortOrder)  error,}) {final _that = this;
 switch (_that) {
 case Initial():
-return initial();case Loading():
-return loading();case Success():
-return success(_that.documents);case Error():
-return error(_that.errorKey);}
+return initial(_that.searchQuery,_that.sortOrder);case Loading():
+return loading(_that.searchQuery,_that.sortOrder);case Success():
+return success(_that.documents,_that.searchQuery,_that.sortOrder);case Error():
+return error(_that.errorKey,_that.searchQuery,_that.sortOrder);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -169,13 +201,13 @@ return error(_that.errorKey);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<DocumentModel> documents)?  success,TResult? Function( String errorKey)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String searchQuery,  DocumentSortOrder sortOrder)?  initial,TResult? Function( String searchQuery,  DocumentSortOrder sortOrder)?  loading,TResult? Function( List<DocumentModel> documents,  String searchQuery,  DocumentSortOrder sortOrder)?  success,TResult? Function( String errorKey,  String searchQuery,  DocumentSortOrder sortOrder)?  error,}) {final _that = this;
 switch (_that) {
 case Initial() when initial != null:
-return initial();case Loading() when loading != null:
-return loading();case Success() when success != null:
-return success(_that.documents);case Error() when error != null:
-return error(_that.errorKey);case _:
+return initial(_that.searchQuery,_that.sortOrder);case Loading() when loading != null:
+return loading(_that.searchQuery,_that.sortOrder);case Success() when success != null:
+return success(_that.documents,_that.searchQuery,_that.sortOrder);case Error() when error != null:
+return error(_that.errorKey,_that.searchQuery,_that.sortOrder);case _:
   return null;
 
 }
@@ -187,71 +219,143 @@ return error(_that.errorKey);case _:
 
 
 class Initial implements DocumentListState {
-  const Initial();
+  const Initial({this.searchQuery = '', this.sortOrder = DocumentSortOrder.dateDesc});
   
 
+@override@JsonKey() final  String searchQuery;
+@override@JsonKey() final  DocumentSortOrder sortOrder;
 
-
+/// Create a copy of DocumentListState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$InitialCopyWith<Initial> get copyWith => _$InitialCopyWithImpl<Initial>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Initial);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Initial&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,searchQuery,sortOrder);
 
 @override
 String toString() {
-  return 'DocumentListState.initial()';
+  return 'DocumentListState.initial(searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class $InitialCopyWith<$Res> implements $DocumentListStateCopyWith<$Res> {
+  factory $InitialCopyWith(Initial value, $Res Function(Initial) _then) = _$InitialCopyWithImpl;
+@override @useResult
+$Res call({
+ String searchQuery, DocumentSortOrder sortOrder
+});
 
 
+
+
+}
+/// @nodoc
+class _$InitialCopyWithImpl<$Res>
+    implements $InitialCopyWith<$Res> {
+  _$InitialCopyWithImpl(this._self, this._then);
+
+  final Initial _self;
+  final $Res Function(Initial) _then;
+
+/// Create a copy of DocumentListState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? searchQuery = null,Object? sortOrder = null,}) {
+  return _then(Initial(
+searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as String,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
+as DocumentSortOrder,
+  ));
+}
+
+
+}
 
 /// @nodoc
 
 
 class Loading implements DocumentListState {
-  const Loading();
+  const Loading({required this.searchQuery, required this.sortOrder});
   
 
+@override final  String searchQuery;
+@override final  DocumentSortOrder sortOrder;
 
-
+/// Create a copy of DocumentListState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LoadingCopyWith<Loading> get copyWith => _$LoadingCopyWithImpl<Loading>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Loading);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Loading&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,searchQuery,sortOrder);
 
 @override
 String toString() {
-  return 'DocumentListState.loading()';
+  return 'DocumentListState.loading(searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class $LoadingCopyWith<$Res> implements $DocumentListStateCopyWith<$Res> {
+  factory $LoadingCopyWith(Loading value, $Res Function(Loading) _then) = _$LoadingCopyWithImpl;
+@override @useResult
+$Res call({
+ String searchQuery, DocumentSortOrder sortOrder
+});
 
 
+
+
+}
+/// @nodoc
+class _$LoadingCopyWithImpl<$Res>
+    implements $LoadingCopyWith<$Res> {
+  _$LoadingCopyWithImpl(this._self, this._then);
+
+  final Loading _self;
+  final $Res Function(Loading) _then;
+
+/// Create a copy of DocumentListState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? searchQuery = null,Object? sortOrder = null,}) {
+  return _then(Loading(
+searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as String,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
+as DocumentSortOrder,
+  ));
+}
+
+
+}
 
 /// @nodoc
 
 
 class Success implements DocumentListState {
-  const Success({required final  List<DocumentModel> documents}): _documents = documents;
+  const Success({required final  List<DocumentModel> documents, required this.searchQuery, required this.sortOrder}): _documents = documents;
   
 
  final  List<DocumentModel> _documents;
@@ -261,10 +365,12 @@ class Success implements DocumentListState {
   return EqualUnmodifiableListView(_documents);
 }
 
+@override final  String searchQuery;
+@override final  DocumentSortOrder sortOrder;
 
 /// Create a copy of DocumentListState
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $SuccessCopyWith<Success> get copyWith => _$SuccessCopyWithImpl<Success>(this, _$identity);
 
@@ -272,16 +378,16 @@ $SuccessCopyWith<Success> get copyWith => _$SuccessCopyWithImpl<Success>(this, _
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Success&&const DeepCollectionEquality().equals(other._documents, _documents));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Success&&const DeepCollectionEquality().equals(other._documents, _documents)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_documents));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_documents),searchQuery,sortOrder);
 
 @override
 String toString() {
-  return 'DocumentListState.success(documents: $documents)';
+  return 'DocumentListState.success(documents: $documents, searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 
 
@@ -290,9 +396,9 @@ String toString() {
 /// @nodoc
 abstract mixin class $SuccessCopyWith<$Res> implements $DocumentListStateCopyWith<$Res> {
   factory $SuccessCopyWith(Success value, $Res Function(Success) _then) = _$SuccessCopyWithImpl;
-@useResult
+@override @useResult
 $Res call({
- List<DocumentModel> documents
+ List<DocumentModel> documents, String searchQuery, DocumentSortOrder sortOrder
 });
 
 
@@ -309,10 +415,12 @@ class _$SuccessCopyWithImpl<$Res>
 
 /// Create a copy of DocumentListState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? documents = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? documents = null,Object? searchQuery = null,Object? sortOrder = null,}) {
   return _then(Success(
 documents: null == documents ? _self._documents : documents // ignore: cast_nullable_to_non_nullable
-as List<DocumentModel>,
+as List<DocumentModel>,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as String,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
+as DocumentSortOrder,
   ));
 }
 
@@ -323,14 +431,16 @@ as List<DocumentModel>,
 
 
 class Error implements DocumentListState {
-  const Error({required this.errorKey});
+  const Error({required this.errorKey, required this.searchQuery, required this.sortOrder});
   
 
  final  String errorKey;
+@override final  String searchQuery;
+@override final  DocumentSortOrder sortOrder;
 
 /// Create a copy of DocumentListState
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $ErrorCopyWith<Error> get copyWith => _$ErrorCopyWithImpl<Error>(this, _$identity);
 
@@ -338,16 +448,16 @@ $ErrorCopyWith<Error> get copyWith => _$ErrorCopyWithImpl<Error>(this, _$identit
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error&&(identical(other.errorKey, errorKey) || other.errorKey == errorKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error&&(identical(other.errorKey, errorKey) || other.errorKey == errorKey)&&(identical(other.searchQuery, searchQuery) || other.searchQuery == searchQuery)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,errorKey);
+int get hashCode => Object.hash(runtimeType,errorKey,searchQuery,sortOrder);
 
 @override
 String toString() {
-  return 'DocumentListState.error(errorKey: $errorKey)';
+  return 'DocumentListState.error(errorKey: $errorKey, searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 
 
@@ -356,9 +466,9 @@ String toString() {
 /// @nodoc
 abstract mixin class $ErrorCopyWith<$Res> implements $DocumentListStateCopyWith<$Res> {
   factory $ErrorCopyWith(Error value, $Res Function(Error) _then) = _$ErrorCopyWithImpl;
-@useResult
+@override @useResult
 $Res call({
- String errorKey
+ String errorKey, String searchQuery, DocumentSortOrder sortOrder
 });
 
 
@@ -375,10 +485,12 @@ class _$ErrorCopyWithImpl<$Res>
 
 /// Create a copy of DocumentListState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? errorKey = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? errorKey = null,Object? searchQuery = null,Object? sortOrder = null,}) {
   return _then(Error(
 errorKey: null == errorKey ? _self.errorKey : errorKey // ignore: cast_nullable_to_non_nullable
-as String,
+as String,searchQuery: null == searchQuery ? _self.searchQuery : searchQuery // ignore: cast_nullable_to_non_nullable
+as String,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
+as DocumentSortOrder,
   ));
 }
 

@@ -402,6 +402,13 @@ class AppLocalizationsPl extends AppLocalizations {
       'Czy na pewno chcesz usunąć swoje konto? Tej operacji nie można cofnąć.';
 
   @override
+  String get deleteDocumentDialogTitle => 'Usuń dokument?';
+
+  @override
+  String get deleteDocumentDialogBody =>
+      'Czy na pewno chcesz usunąć ten dokument? Tej operacji nie można cofnąć.';
+
+  @override
   String get cancelButtonLabel => 'Anuluj';
 
   @override
@@ -445,10 +452,16 @@ class AppLocalizationsPl extends AppLocalizations {
   String get navDashboard => 'Pulpit';
 
   @override
+  String get dashboardRecentScans => 'Ostatnie skany';
+
+  @override
   String get navMyScans => 'Moje skany';
 
   @override
   String get navSettings => 'Ustawienia';
+
+  @override
+  String get settingsDarkMode => 'Ciemny motyw';
 
   @override
   String get dashboardGreeting => 'Witaj w MobiScan';

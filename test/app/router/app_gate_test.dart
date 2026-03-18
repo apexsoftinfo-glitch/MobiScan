@@ -7,21 +7,53 @@ import 'package:mocktail/mocktail.dart';
 import 'package:myapp/app/router/app_gate.dart';
 import 'package:myapp/app/session/models/session_status_model.dart';
 import 'package:myapp/app/session/presentation/cubit/session_cubit.dart';
+import 'package:myapp/app/theme/theme_cubit.dart';
 import 'package:myapp/core/di/injection.dart';
 import 'package:myapp/features/auth/presentation/cubit/welcome_cubit.dart';
+import 'package:myapp/features/documents/presentation/cubit/document_list_cubit.dart';
+import 'package:myapp/features/documents/presentation/cubit/document_scanner_cubit.dart';
 import 'package:myapp/l10n/generated/app_localizations.dart';
 
 import '../../support/mocks.dart';
+
+class MockThemeCubit extends Mock implements ThemeCubit {}
+class MockDocumentListCubit extends Mock implements DocumentListCubit {}
+class MockDocumentScannerCubit extends Mock implements DocumentScannerCubit {}
 
 void main() {
   late MockSessionRepository sessionRepository;
   late MockAuthRepository authRepository;
   late StreamController<SessionStatusModel> sessionController;
+  late MockThemeCubit themeCubit;
+  late MockDocumentListCubit documentListCubit;
+  late MockDocumentScannerCubit documentScannerCubit;
 
   setUp(() async {
     sessionRepository = MockSessionRepository();
     authRepository = MockAuthRepository();
     sessionController = StreamController<SessionStatusModel>();
+    themeCubit = MockThemeCubit();
+    documentListCubit = MockDocumentListCubit();
+    documentScannerCubit = MockDocumentScannerCubit();
+
+    // ThemeCubit stubbing
+    when(() => themeCubit.state).thenReturn(const ThemeState.initial(themeMode: ThemeMode.light));
+    when(() => themeCubit.stream).thenAnswer((_) => Stream.value(const ThemeState.initial(themeMode: ThemeMode.light)));
+    when(() => themeCubit.isClosed).thenReturn(false);
+    when(() => themeCubit.close()).thenAnswer((_) async {});
+
+    // DocumentListCubit stubbing
+    when(() => documentListCubit.state).thenReturn(const DocumentListState.initial());
+    when(() => documentListCubit.stream).thenAnswer((_) => Stream.value(const DocumentListState.initial()));
+    when(() => documentListCubit.loadDocuments(any())).thenAnswer((_) async {});
+    when(() => documentListCubit.isClosed).thenReturn(false);
+    when(() => documentListCubit.close()).thenAnswer((_) async {});
+
+    // DocumentScannerCubit stubbing
+    when(() => documentScannerCubit.state).thenReturn(const DocumentScannerState.initial());
+    when(() => documentScannerCubit.stream).thenAnswer((_) => Stream.value(const DocumentScannerState.initial()));
+    when(() => documentScannerCubit.isClosed).thenReturn(false);
+    when(() => documentScannerCubit.close()).thenAnswer((_) async {});
 
     when(
       () => sessionRepository.sessionStream,
@@ -34,6 +66,8 @@ void main() {
 
     await getIt.reset();
     getIt.registerFactory<WelcomeCubit>(() => WelcomeCubit(authRepository));
+    getIt.registerFactory<DocumentListCubit>(() => documentListCubit);
+    getIt.registerFactory<DocumentScannerCubit>(() => documentScannerCubit);
   });
 
   tearDown(() async {
@@ -48,8 +82,11 @@ void main() {
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: BlocProvider<SessionCubit>.value(
-          value: sessionCubit,
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<SessionCubit>.value(value: sessionCubit),
+            BlocProvider<ThemeCubit>.value(value: themeCubit),
+          ],
           child: const AppGate(),
         ),
       ),
@@ -68,8 +105,11 @@ void main() {
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: BlocProvider<SessionCubit>.value(
-          value: sessionCubit,
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<SessionCubit>.value(value: sessionCubit),
+            BlocProvider<ThemeCubit>.value(value: themeCubit),
+          ],
           child: const AppGate(),
         ),
       ),
@@ -87,8 +127,11 @@ void main() {
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: BlocProvider<SessionCubit>.value(
-          value: sessionCubit,
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<SessionCubit>.value(value: sessionCubit),
+            BlocProvider<ThemeCubit>.value(value: themeCubit),
+          ],
           child: const AppGate(),
         ),
       ),
@@ -97,9 +140,10 @@ void main() {
       buildAuthenticatedSessionStatus(userId: 'guest-1', isAnonymous: true),
     );
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('Aktualna sesja'), findsOneWidget);
-    expect(find.byIcon(Icons.person_outline), findsOneWidget);
+    expect(find.text('Witaj w MobiScan'), findsOneWidget);
+    expect(find.byIcon(Icons.add_rounded), findsOneWidget);
   });
 
   testWidgets('shows shared users setup screen for schema error', (
@@ -111,8 +155,11 @@ void main() {
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: BlocProvider<SessionCubit>.value(
-          value: sessionCubit,
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<SessionCubit>.value(value: sessionCubit),
+            BlocProvider<ThemeCubit>.value(value: themeCubit),
+          ],
           child: const AppGate(),
         ),
       ),

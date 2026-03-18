@@ -26,7 +26,7 @@ class AppDesignSystem {
   }) {
     return BoxDecoration(
       color: color ?? surface,
-      borderRadius: borderRadius ?? BorderRadius.circular(16),
+      borderRadius: borderRadius ?? BorderRadius.circular(8),
       border: Border.all(color: outline, width: 1),
       boxShadow: [
         BoxShadow(

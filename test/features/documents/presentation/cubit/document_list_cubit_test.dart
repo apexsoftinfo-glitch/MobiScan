@@ -13,7 +13,7 @@ void main() {
   });
 
   group('DocumentListCubit', () {
-    final userId = 'user-1';
+    const userId = 'user-1';
     final docs = [
       buildDocumentModel(id: 'doc-1', userId: userId, name: 'Scan 1'),
     ];
@@ -27,8 +27,15 @@ void main() {
       },
       act: (cubit) => cubit.loadDocuments(userId),
       expect: () => [
-        const DocumentListState.loading(),
-        DocumentListState.success(documents: docs),
+        const DocumentListState.loading(
+          searchQuery: '',
+          sortOrder: DocumentSortOrder.dateDesc,
+        ),
+        DocumentListState.success(
+          documents: docs,
+          searchQuery: '',
+          sortOrder: DocumentSortOrder.dateDesc,
+        ),
       ],
     );
 
@@ -41,8 +48,15 @@ void main() {
       },
       act: (cubit) => cubit.loadDocuments(userId),
       expect: () => [
-        const DocumentListState.loading(),
-        const DocumentListState.error(errorKey: 'unknown_error'),
+        const DocumentListState.loading(
+          searchQuery: '',
+          sortOrder: DocumentSortOrder.dateDesc,
+        ),
+        const DocumentListState.error(
+          errorKey: 'unknown_error',
+          searchQuery: '',
+          sortOrder: DocumentSortOrder.dateDesc,
+        ),
       ],
     );
   });

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/widgets.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -25,7 +26,7 @@ sealed class PdfExportState with _$PdfExportState {
 class PdfExportCubit extends Cubit<PdfExportState> {
   PdfExportCubit() : super(const PdfExportState.initial());
 
-  Future<void> exportToPdf(DocumentModel document) async {
+  Future<void> exportToPdf(DocumentModel document, {Rect? sharePositionOrigin}) async {
     if (document.pages.isEmpty) {
       emit(const PdfExportState.error(errorKey: 'no_pages_error'));
       return;
@@ -60,7 +61,11 @@ class PdfExportCubit extends Cubit<PdfExportState> {
       final file = File("${output.path}/$sanitizedName.pdf");
       await file.writeAsBytes(await pdf.save());
 
-      await Share.shareXFiles([XFile(file.path)], text: document.name);
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: document.name,
+        sharePositionOrigin: sharePositionOrigin,
+      );
       
       emit(const PdfExportState.success());
     } catch (e) {

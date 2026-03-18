@@ -15,12 +15,13 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const _LogoTitle(),
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: theme.scaffoldBackgroundColor,
         scrolledUnderElevation: 0,
       ),
       body: SafeArea(
@@ -50,6 +51,7 @@ class _LogoTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         Container(
@@ -62,12 +64,12 @@ class _LogoTitle extends StatelessWidget {
           child: const Icon(Icons.document_scanner_rounded, size: 18, color: Colors.white),
         ),
         const SizedBox(width: 10),
-        const Text(
+        Text(
           'MobiScan',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF111827),
+            color: theme.textTheme.titleLarge?.color ?? const Color(0xFF111827),
             letterSpacing: -0.5,
           ),
         ),
@@ -83,24 +85,25 @@ class _GreetingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.dashboardGreeting,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF111827),
+            color: theme.textTheme.headlineLarge?.color ?? const Color(0xFF111827),
             letterSpacing: -0.5,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           l10n.dashboardGreetingSubtitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
-            color: AppDesignSystem.textSecondary,
+            color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6) ?? AppDesignSystem.textSecondary,
           ),
         ),
       ],
@@ -115,12 +118,13 @@ class _StatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BlocBuilder<list_cubit.DocumentListCubit, list_cubit.DocumentListState>(
       builder: (context, state) {
         final count = state is list_cubit.Success ? state.documents.length : 0;
         return Container(
           padding: const EdgeInsets.all(20),
-          decoration: AppDesignSystem.cardDecoration(),
+          decoration: AppDesignSystem.cardDecoration(color: theme.cardTheme.color),
           child: Row(
             children: [
               Container(
@@ -128,7 +132,7 @@ class _StatsCard extends StatelessWidget {
                 height: 52,
                 decoration: BoxDecoration(
                   gradient: AppDesignSystem.primaryGradient,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.folder_copy_rounded, color: Colors.white, size: 26),
               ),
@@ -138,18 +142,18 @@ class _StatsCard extends StatelessWidget {
                 children: [
                   Text(
                     '$count',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF111827),
+                      color: theme.textTheme.displaySmall?.color ?? const Color(0xFF111827),
                       letterSpacing: -1,
                     ),
                   ),
                   Text(
                     l10n.dashboardTotalScans,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: AppDesignSystem.textSecondary,
+                      color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? AppDesignSystem.textSecondary,
                     ),
                   ),
                 ],
@@ -180,7 +184,7 @@ class _ScanButton extends StatelessWidget {
           height: 56,
           decoration: BoxDecoration(
             gradient: AppDesignSystem.primaryGradient,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
                 color: AppDesignSystem.primary.withValues(alpha: 0.3),
@@ -193,7 +197,7 @@ class _ScanButton extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: isLoading
                 ? null
@@ -228,6 +232,7 @@ class _RecentScansSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BlocBuilder<list_cubit.DocumentListCubit, list_cubit.DocumentListState>(
       builder: (context, state) {
         if (state is! list_cubit.Success || state.documents.isEmpty) {
@@ -238,11 +243,11 @@ class _RecentScansSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l10n.navMyScans,
-              style: const TextStyle(
+              l10n.dashboardRecentScans,
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF111827),
+                color: theme.textTheme.titleMedium?.color ?? const Color(0xFF111827),
               ),
             ),
             const SizedBox(height: 12),
@@ -253,34 +258,34 @@ class _RecentScansSection extends StatelessWidget {
                   onTap: () => AppNavigator.goToDocumentDetail(context, doc),
                   child: Container(
                     padding: const EdgeInsets.all(14),
-                    decoration: AppDesignSystem.cardDecoration(),
+                    decoration: AppDesignSystem.cardDecoration(color: theme.cardTheme.color),
                     child: Row(
                       children: [
                         Container(
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: AppDesignSystem.primary.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(10),
+                            color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.article_rounded,
-                              color: AppDesignSystem.primary, size: 20),
+                          child: Icon(Icons.article_rounded,
+                              color: theme.colorScheme.primary, size: 20),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             doc.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
-                              color: Color(0xFF111827),
+                              color: theme.textTheme.bodyLarge?.color ?? const Color(0xFF111827),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const Icon(Icons.chevron_right_rounded,
-                            color: AppDesignSystem.textSecondary, size: 20),
+                        Icon(Icons.chevron_right_rounded,
+                            color: theme.iconTheme.color?.withValues(alpha: 0.5) ?? AppDesignSystem.textSecondary, size: 20),
                       ],
                     ),
                   ),

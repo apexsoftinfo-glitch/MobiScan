@@ -17,7 +17,9 @@ import 'package:myapp/app/session/data/repositories/session_repository.dart'
     as _i526;
 import 'package:myapp/app/session/presentation/cubit/session_cubit.dart'
     as _i934;
+import 'package:myapp/app/theme/theme_cubit.dart' as _i169;
 import 'package:myapp/core/di/app_module.dart' as _i832;
+import 'package:myapp/core/di/injection.dart' as _i979;
 import 'package:myapp/features/auth/data/datasources/auth_data_source.dart'
     as _i538;
 import 'package:myapp/features/auth/data/repositories/auth_repository.dart'
@@ -52,16 +54,22 @@ import 'package:myapp/features/subscription/data/datasources/subscription_data_s
     as _i138;
 import 'package:myapp/features/subscription/data/repositories/subscription_repository.dart'
     as _i894;
+import 'package:shared_preferences/shared_preferences.dart' as _i460;
 import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
-  _i174.GetIt init({
+  Future<_i174.GetIt> init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
-  }) {
+  }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    final registerModule = _$RegisterModule();
     final appModule = _$AppModule();
+    await gh.factoryAsync<_i460.SharedPreferences>(
+      () => registerModule.prefs,
+      preResolve: true,
+    );
     gh.factory<_i971.PdfExportCubit>(() => _i971.PdfExportCubit());
     gh.lazySingleton<_i454.SupabaseClient>(() => appModule.supabaseClient);
     gh.lazySingleton<_i130.DocumentScannerService>(
@@ -79,6 +87,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i308.DocumentDataSource>(
       () => _i308.SupabaseDocumentDataSource(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i169.ThemeCubit>(
+      () => _i169.ThemeCubit(gh<_i460.SharedPreferences>()),
     );
     gh.lazySingleton<_i538.AuthDataSource>(
       () => _i538.SupabaseAuthDataSource(gh<_i454.SupabaseClient>()),
@@ -135,5 +146,7 @@ extension GetItInjectableX on _i174.GetIt {
     return this;
   }
 }
+
+class _$RegisterModule extends _i979.RegisterModule {}
 
 class _$AppModule extends _i832.AppModule {}

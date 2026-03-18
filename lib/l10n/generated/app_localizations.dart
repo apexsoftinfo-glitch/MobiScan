@@ -790,6 +790,18 @@ abstract class AppLocalizations {
   /// **'Czy na pewno chcesz usunąć swoje konto? Tej operacji nie można cofnąć.'**
   String get deleteAccountDialogBody;
 
+  /// No description provided for @deleteDocumentDialogTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usuń dokument?'**
+  String get deleteDocumentDialogTitle;
+
+  /// No description provided for @deleteDocumentDialogBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Czy na pewno chcesz usunąć ten dokument? Tej operacji nie można cofnąć.'**
+  String get deleteDocumentDialogBody;
+
   /// No description provided for @cancelButtonLabel.
   ///
   /// In pl, this message translates to:
@@ -874,6 +886,12 @@ abstract class AppLocalizations {
   /// **'Pulpit'**
   String get navDashboard;
 
+  /// No description provided for @dashboardRecentScans.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ostatnie skany'**
+  String get dashboardRecentScans;
+
   /// No description provided for @navMyScans.
   ///
   /// In pl, this message translates to:
@@ -885,6 +903,12 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Ustawienia'**
   String get navSettings;
+
+  /// No description provided for @settingsDarkMode.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ciemny motyw'**
+  String get settingsDarkMode;
 
   /// No description provided for @dashboardGreeting.
   ///
