@@ -46,9 +46,82 @@ class SettingsScreen extends StatelessWidget {
                 );
               },
             ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: AppDesignSystem.cardDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.privacy_tip_outlined,
+                        size: 20,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Informacja o danych',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _InfoItem(
+                    title: 'Prywatność',
+                    body: 'Twoje fizyczne skany nie opuszczają urządzenia bez Twojej wiedzy (np. dopóki ich nie udostępnisz jako PDF).',
+                  ),
+                  const SizedBox(height: 12),
+                  _InfoItem(
+                    title: 'Brak synchronizacji',
+                    body: 'Jeśli zalogujesz się na innym telefonie, zobaczysz listę skanów, ale nie będziesz mógł podejrzeć obrazów, ponieważ pliki źródłowe zostały na pierwszym telefonie.',
+                  ),
+                  const SizedBox(height: 12),
+                  _InfoItem(
+                    title: 'Ryzyko utraty',
+                    body: 'Jeśli odinstalujesz aplikację lub wyczyścisz dane, Twoje skany zostaną bezpowrotnie usunięte (chyba że masz kopię zapasową całego telefonu).',
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _InfoItem extends StatelessWidget {
+  const _InfoItem({required this.title, required this.body});
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          body,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+          ),
+        ),
+      ],
     );
   }
 }
