@@ -140,6 +140,14 @@ class _RegisterViewState extends State<_RegisterView> {
                                   )
                                 : Text(l10n.registerButtonLabel),
                           ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Po kliknięciu "Zarejestruj", otrzymasz e-mail z linkiem potwierdzającym. Dopiero po jego kliknięciu Twój status konta zmieni się z "Gość" na pełne konto.',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ],
                       );
                     },

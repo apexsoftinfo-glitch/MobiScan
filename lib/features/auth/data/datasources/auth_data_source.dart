@@ -81,12 +81,17 @@ class SupabaseAuthDataSource implements AuthDataSource {
     debugPrint(
       'ℹ️ [AuthDataSource] upgradeAnonymousWithEmail started email=$email',
     );
-    await _supabaseClient.auth.updateUser(
-      UserAttributes(email: email, password: password),
-    );
-    debugPrint(
-      '✅ [AuthDataSource] upgradeAnonymousWithEmail succeeded email=$email',
-    );
+    try {
+      await _supabaseClient.auth.updateUser(
+        UserAttributes(email: email, password: password),
+      );
+      debugPrint(
+        '✅ [AuthDataSource] upgradeAnonymousWithEmail succeeded email=$email',
+      );
+    } catch (error) {
+      debugPrint('❌ [AuthDataSource] upgradeAnonymousWithEmail error: $error');
+      rethrow;
+    }
   }
 
   @override
@@ -94,7 +99,13 @@ class SupabaseAuthDataSource implements AuthDataSource {
     debugPrint('ℹ️ [AuthDataSource] deleteAccount started');
 
     try {
-      final response = await _supabaseClient.functions.invoke('delete-account');
+      final session = _supabaseClient.auth.currentSession;
+      final response = await _supabaseClient.functions.invoke(
+        'delete-account',
+        headers: {
+          'Authorization': 'Bearer ${session?.accessToken}',
+        },
+      );
       debugPrint(
         '✅ [AuthDataSource] deleteAccount succeeded status=${response.status}',
       );
