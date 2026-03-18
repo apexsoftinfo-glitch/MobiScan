@@ -867,6 +867,66 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Nieznany błąd'**
   String get errorUnknownKey;
+
+  /// No description provided for @navDashboard.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pulpit'**
+  String get navDashboard;
+
+  /// No description provided for @navMyScans.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje skany'**
+  String get navMyScans;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ustawienia'**
+  String get navSettings;
+
+  /// No description provided for @dashboardGreeting.
+  ///
+  /// In pl, this message translates to:
+  /// **'Witaj w MobiScan'**
+  String get dashboardGreeting;
+
+  /// No description provided for @dashboardGreetingSubtitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Szybkie skanowanie, bez reklam.'**
+  String get dashboardGreetingSubtitle;
+
+  /// No description provided for @dashboardTotalScans.
+  ///
+  /// In pl, this message translates to:
+  /// **'Łącznie skanów'**
+  String get dashboardTotalScans;
+
+  /// No description provided for @dashboardStartScan.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nowy skan'**
+  String get dashboardStartScan;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ustawienia'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsProfile.
+  ///
+  /// In pl, this message translates to:
+  /// **'Mój profil'**
+  String get settingsProfile;
+
+  /// No description provided for @settingsVersion.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wersja aplikacji'**
+  String get settingsVersion;
 }
 
 class _AppLocalizationsDelegate

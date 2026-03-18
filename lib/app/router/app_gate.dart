@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/l10n.dart';
 import '../ui/shared_users_setup_required_screen.dart';
 import '../../shared/error_messages.dart';
-import '../../features/home/ui/home_screen.dart';
+import '../ui/main_shell.dart';
 import '../../features/welcome/ui/welcome_screen.dart';
 import '../session/presentation/cubit/session_cubit.dart';
 
@@ -37,7 +37,7 @@ class AppGate extends StatelessWidget {
           );
         }
 
-        return const HomeScreen();
+        return const MainShell();
       },
     );
   }

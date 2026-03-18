@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 
 class AppDesignSystem {
   // --- Colors ---
-  static const Color background = Color(0xFF0D0D12);
-  static const Color surface = Color(0xFF1C1C23);
-  static const Color primary = Color(0xFF6366F1); // Modern Indigo
-  static const Color secondary = Color(0xFFA855F7); // Purple
+  static const Color background = Color(0xFFF7F8FA);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color primary = Color(0xFF4F46E5); // Deep Indigo
+  static const Color secondary = Color(0xFF7C3AED); // Violet
   static const Color accent = Color(0xFF10B981); // Emerald
-  
-  static const Color textPrimary = Color(0xFFF9FAFB);
-  static const Color textSecondary = Color(0xFF9CA3AF);
-  static const Color outline = Color(0xFF2D2D35);
+
+  static const Color textPrimary = Color(0xFF111827);
+  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color outline = Color(0xFFE5E7EB);
 
   // --- Gradients ---
   static const Gradient primaryGradient = LinearGradient(
@@ -20,30 +19,22 @@ class AppDesignSystem {
     end: Alignment.bottomRight,
   );
 
-  // --- Glassmorphism ---
-  static Widget glassEffect({
-    required Widget child,
-    double blur = 10,
-    double opacity = 0.1,
-    Color color = Colors.white,
+  // --- Card decoration ---
+  static BoxDecoration cardDecoration({
     BorderRadius? borderRadius,
+    Color? color,
   }) {
-    return ClipRRect(
-      borderRadius: borderRadius ?? BorderRadius.zero,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-        child: Container(
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: opacity),
-            borderRadius: borderRadius,
-            border: Border.all(
-              color: color.withValues(alpha: 0.1),
-              width: 0.5,
-            ),
-          ),
-          child: child,
+    return BoxDecoration(
+      color: color ?? surface,
+      borderRadius: borderRadius ?? BorderRadius.circular(16),
+      border: Border.all(color: outline, width: 1),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.05),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
         ),
-      ),
+      ],
     );
   }
 

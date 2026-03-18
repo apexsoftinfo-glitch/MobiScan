@@ -39,12 +39,9 @@ class DocumentDetailScreen extends StatelessWidget {
                     );
                   }
                 },
-                error: (e) {
+                error: (_) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.errorUnknown),
-                      backgroundColor: Colors.redAccent,
-                    ),
+                    SnackBar(content: Text(l10n.errorUnknown)),
                   );
                 },
                 orElse: () {},
@@ -55,14 +52,11 @@ class DocumentDetailScreen extends StatelessWidget {
             listener: (context, state) {
               state.maybeMap(
                 error: (e) {
-                  final errorMsg = e.errorKey == 'no_pages_error' 
-                    ? l10n.noPagesError 
-                    : l10n.errorUnknown;
+                  final errorMsg = e.errorKey == 'no_pages_error'
+                      ? l10n.noPagesError
+                      : l10n.errorUnknown;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(errorMsg),
-                      backgroundColor: Colors.redAccent,
-                    ),
+                    SnackBar(content: Text(errorMsg)),
                   );
                 },
                 orElse: () {},
@@ -85,104 +79,50 @@ class _DocumentDetailView extends StatelessWidget {
     final l10n = context.l10n;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: AppDesignSystem.glassEffect(
-          child: AppBar(
-            title: Text(document.name, style: const TextStyle(fontWeight: FontWeight.w800)),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.edit_outlined),
-                onPressed: () => _showRenameDialog(context),
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline_rounded),
-                onPressed: () => _showDeleteConfirmation(context),
-              ),
-            ],
-          ),
+      backgroundColor: const Color(0xFFF7F8FA),
+      appBar: AppBar(
+        title: Text(
+          document.name,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () => _showRenameDialog(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline_rounded),
+            onPressed: () => _showDeleteConfirmation(context),
+          ),
+        ],
       ),
-      body: Stack(
+      body: Column(
         children: [
-          // Background Glow
-          Positioned(
-            top: -100,
-            right: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppDesignSystem.secondary.withValues(alpha: 0.05),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.7,
               ),
+              itemCount: document.pages.length,
+              itemBuilder: (context, index) {
+                final page = document.pages[index];
+                return _PageThumbnail(
+                  path: page.storagePath,
+                  index: index + 1,
+                  documentId: document.id,
+                );
+              },
             ),
           ),
-          Column(
-            children: [
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, kToolbarHeight + 32, 16, 16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.7,
-                  ),
-                  itemCount: document.pages.length,
-                  itemBuilder: (context, index) {
-                    final page = document.pages[index];
-                    return _PageThumbnail(
-                      path: page.storagePath, 
-                      index: index + 1,
-                      documentId: document.id,
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: BlocBuilder<PdfExportCubit, PdfExportState>(
-                  builder: (context, state) {
-                    final isGenerating = state is Generating;
-                    return Container(
-                      width: double.infinity,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: AppDesignSystem.primaryGradient,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppDesignSystem.primary.withValues(alpha: 0.3),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        ),
-                        onPressed: isGenerating 
-                          ? null 
-                          : () => context.read<PdfExportCubit>().exportToPdf(document),
-                        icon: isGenerating 
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Icon(Icons.share_rounded, color: Colors.white),
-                        label: Text(
-                          isGenerating ? l10n.generatingPdfLabel : l10n.exportPdfButtonLabel,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+          _ExportButton(document: document, l10n: l10n),
         ],
       ),
     );
@@ -191,58 +131,38 @@ class _DocumentDetailView extends StatelessWidget {
   void _showRenameDialog(BuildContext context) {
     final l10n = context.l10n;
     final controller = TextEditingController(text: document.name);
-    showGeneralDialog(
+    showDialog(
       context: context,
-      barrierDismissible: true,
-      barrierLabel: '',
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
-      transitionBuilder: (context, anim1, anim2, child) {
-        return Transform.scale(
-          scale: anim1.value,
-          child: Opacity(
-            opacity: anim1.value,
-            child: AppDesignSystem.glassEffect(
-              borderRadius: BorderRadius.circular(24),
-              child: AlertDialog(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                title: Text(l10n.renameDocumentDialogTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-                content: TextField(
-                  controller: controller,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: l10n.searchScansPlaceholder,
-                    filled: true,
-                    fillColor: Colors.white.withValues(alpha: 0.05),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(l10n.cancelButtonLabel, style: const TextStyle(color: AppDesignSystem.textSecondary)),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppDesignSystem.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onPressed: () {
-                      context.read<DocumentDetailCubit>().renameDocument(
-                        id: document.id,
-                        newName: controller.text,
-                      );
-                      Navigator.pop(context);
-                    },
-                    child: Text(l10n.saveFirstNameButtonLabel, style: const TextStyle(color: Colors.white)),
-                  ),
-                ],
-              ),
-            ),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.renameDocumentDialogTitle,
+            style: const TextStyle(fontWeight: FontWeight.w700)),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: InputDecoration(
+            hintText: l10n.searchScansPlaceholder,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           ),
-        );
-      },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () {
+              context.read<DocumentDetailCubit>().renameDocument(
+                    id: document.id,
+                    newName: controller.text,
+                  );
+              Navigator.pop(dialogContext);
+            },
+            child: Text(l10n.saveFirstNameButtonLabel),
+          ),
+        ],
+      ),
     );
   }
 
@@ -250,27 +170,82 @@ class _DocumentDetailView extends StatelessWidget {
     final l10n = context.l10n;
     showDialog(
       context: context,
-      builder: (diagContext) => AppDesignSystem.glassEffect(
-        borderRadius: BorderRadius.circular(24),
-        child: AlertDialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text(l10n.deleteAccountDialogTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-          content: Text(l10n.deleteAccountDialogBody),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(diagContext),
-              child: Text(l10n.cancelButtonLabel, style: const TextStyle(color: AppDesignSystem.textSecondary)),
+      builder: (diagContext) => AlertDialog(
+        title: Text(l10n.deleteAccountDialogTitle,
+            style: const TextStyle(fontWeight: FontWeight.w700)),
+        content: Text(l10n.deleteAccountDialogBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(diagContext),
+            child: Text(l10n.cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<DocumentDetailCubit>().deleteDocument(document.id);
+              Navigator.pop(diagContext);
+            },
+            child: Text(
+              'Usuń',
+              style: TextStyle(color: Colors.red.shade600, fontWeight: FontWeight.bold),
             ),
-            TextButton(
-              onPressed: () {
-                context.read<DocumentDetailCubit>().deleteDocument(document.id);
-                Navigator.pop(diagContext);
-              },
-              child: const Text('Usuń', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExportButton extends StatelessWidget {
+  const _ExportButton({required this.document, required this.l10n});
+
+  final DocumentModel document;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+      child: BlocBuilder<PdfExportCubit, PdfExportState>(
+        builder: (context, state) {
+          final isGenerating = state is Generating;
+          return Container(
+            width: double.infinity,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: AppDesignSystem.primaryGradient,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppDesignSystem.primary.withValues(alpha: 0.3),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          ],
-        ),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              onPressed: isGenerating
+                  ? null
+                  : () => context.read<PdfExportCubit>().exportToPdf(document),
+              icon: isGenerating
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.share_rounded, color: Colors.white),
+              label: Text(
+                isGenerating ? l10n.generatingPdfLabel : l10n.exportPdfButtonLabel,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -289,13 +264,13 @@ class _PageThumbnail extends StatelessWidget {
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppDesignSystem.outline),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -306,15 +281,15 @@ class _PageThumbnail extends StatelessWidget {
             Positioned(
               bottom: 8,
               right: 8,
-              child: AppDesignSystem.glassEffect(
-                borderRadius: BorderRadius.circular(8),
-                opacity: 0.3,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Text(
-                    '$index',
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$index',
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

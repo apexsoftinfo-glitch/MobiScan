@@ -172,5 +172,15 @@
   "generatingPdfLabel": "Generowanie PDF...",
   "noPagesError": "Dokument nie ma stron.",
   "documentRenamedSnackbar": "Nazwa zmieniona",
-  "errorUnknownKey": "Nieznany błąd"
+  "errorUnknownKey": "Nieznany błąd",
+  "navDashboard": "Pulpit",
+  "navMyScans": "Moje skany",
+  "navSettings": "Ustawienia",
+  "dashboardGreeting": "Witaj w MobiScan",
+  "dashboardGreetingSubtitle": "Szybkie skanowanie, bez reklam.",
+  "dashboardTotalScans": "Łącznie skanów",
+  "dashboardStartScan": "Nowy skan",
+  "settingsTitle": "Ustawienia",
+  "settingsProfile": "Mój profil",
+  "settingsVersion": "Wersja aplikacji"
 }

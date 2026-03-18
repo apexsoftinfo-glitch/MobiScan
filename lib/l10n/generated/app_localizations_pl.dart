@@ -440,4 +440,34 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get errorUnknownKey => 'Nieznany błąd';
+
+  @override
+  String get navDashboard => 'Pulpit';
+
+  @override
+  String get navMyScans => 'Moje skany';
+
+  @override
+  String get navSettings => 'Ustawienia';
+
+  @override
+  String get dashboardGreeting => 'Witaj w MobiScan';
+
+  @override
+  String get dashboardGreetingSubtitle => 'Szybkie skanowanie, bez reklam.';
+
+  @override
+  String get dashboardTotalScans => 'Łącznie skanów';
+
+  @override
+  String get dashboardStartScan => 'Nowy skan';
+
+  @override
+  String get settingsTitle => 'Ustawienia';
+
+  @override
+  String get settingsProfile => 'Mój profil';
+
+  @override
+  String get settingsVersion => 'Wersja aplikacji';
 }
