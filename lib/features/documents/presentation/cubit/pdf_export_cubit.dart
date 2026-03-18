@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../models/document_model.dart';
@@ -33,9 +34,15 @@ class PdfExportCubit extends Cubit<PdfExportState> {
     emit(const PdfExportState.generating());
     try {
       final pdf = pw.Document();
+      final appDocDir = await getApplicationDocumentsDirectory();
 
       for (final page in document.pages) {
-        final imageFile = File(page.storagePath);
+        String fullPath = page.storagePath;
+        if (!fullPath.contains('/') && !fullPath.contains('\\')) {
+          fullPath = p.join(appDocDir.path, page.storagePath);
+        }
+
+        final imageFile = File(fullPath);
         if (await imageFile.exists()) {
           final image = pw.MemoryImage(await imageFile.readAsBytes());
           pdf.addPage(

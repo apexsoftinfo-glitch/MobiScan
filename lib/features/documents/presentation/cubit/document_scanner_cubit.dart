@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:uuid/uuid.dart';
 import '../../data/repositories/document_repository.dart';
 import '../../data/services/document_scanner_service.dart';
 
@@ -53,6 +57,9 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
 
       emit(const DocumentScannerState.saving());
       
+      final appDocDir = await getApplicationDocumentsDirectory();
+      const uuid = Uuid();
+
       // Create document with default name
       final timestamp = DateTime.now().toIso8601String().substring(0, 10);
       final doc = await _documentRepository.createDocument(
@@ -62,9 +69,16 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
 
       // Add pages
       for (var i = 0; i < images.length; i++) {
+        final sourceFile = File(images[i]);
+        final extension = p.extension(images[i]);
+        final fileName = '${uuid.v4()}$extension';
+        final targetPath = p.join(appDocDir.path, fileName);
+        
+        await sourceFile.copy(targetPath);
+
         await _documentRepository.addPage(
           documentId: doc.id,
-          storagePath: images[i],
+          storagePath: fileName, // Store only filename
           pageIndex: i,
         );
       }

@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/design/app_design_system.dart';
 import '../../../../l10n/l10n.dart';
@@ -257,45 +259,78 @@ class _PageThumbnail extends StatelessWidget {
   final int index;
   final String documentId;
 
+  Future<String> _resolvePath() async {
+    if (path.contains('/') || path.contains('\\')) {
+      // It's already an absolute path (or at least looks like one)
+      return path;
+    }
+    final appDocDir = await getApplicationDocumentsDirectory();
+    return p.join(appDocDir.path, path);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'page_${documentId}_$index',
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppDesignSystem.outline),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+    return FutureBuilder<String>(
+      future: _resolvePath(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.file(File(path), fit: BoxFit.cover),
-            Positioned(
-              bottom: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(8),
+            child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          );
+        }
+
+        final resolvedPath = snapshot.data!;
+        final file = File(resolvedPath);
+
+        return Hero(
+          tag: 'page_${documentId}_$index',
+          child: Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppDesignSystem.outline),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
                 ),
-                child: Text(
-                  '$index',
-                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                file.existsSync()
+                    ? Image.file(file, fit: BoxFit.cover)
+                    : Container(
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.broken_image_outlined, color: Colors.grey),
+                      ),
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '$index',
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
