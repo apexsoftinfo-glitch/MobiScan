@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -58,6 +57,7 @@ class _ProfileViewState extends State<_ProfileView> {
     final sharedUser = session.sharedUserOrNull;
     final firstName = sharedUser?.firstName ?? '';
     final l10n = context.l10n;
+    final theme = Theme.of(context);
 
     if (!_firstNameFocusNode.hasFocus &&
         _firstNameController.text != firstName) {
@@ -79,12 +79,11 @@ class _ProfileViewState extends State<_ProfileView> {
         BlocListener<AccountActionsCubit, AccountActionsState>(
           listener: (context, state) {
             if (state.successKey == 'pro_enabled') {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(l10n.proEnabledSnackbar)));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.proEnabledSnackbar)),
+              );
               context.read<AccountActionsCubit>().clearFeedback();
             }
-
             if (state.successKey == 'account_deleted') {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(l10n.accountDeletedSnackbar)),
@@ -98,7 +97,6 @@ class _ProfileViewState extends State<_ProfileView> {
         canPop: !_hasUnsavedChanges(firstName),
         onPopInvokedWithResult: (didPop, result) async {
           if (didPop || !_hasUnsavedChanges(firstName)) return;
-
           final shouldDiscard = await _confirmDiscardChanges(context);
           if (!context.mounted || !shouldDiscard) return;
           Navigator.of(context).pop();
@@ -106,9 +104,24 @@ class _ProfileViewState extends State<_ProfileView> {
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
             appBar: AppBar(
-              title: Text(l10n.profileTitle),
-              centerTitle: true,
+              title: Text(
+                l10n.profileTitle.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 3,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              centerTitle: false,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              scrolledUnderElevation: 0,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(1),
+                child: Divider(height: 1, color: theme.dividerColor),
+              ),
             ),
             body: SafeArea(
               child: BlocBuilder<ProfileCubit, ProfileState>(
@@ -119,205 +132,110 @@ class _ProfileViewState extends State<_ProfileView> {
                       final activeAction = accountState.activeAction;
 
                       return SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 24,
-                          horizontal: 16,
-                        ),
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 600),
-                            child: Column(
-                              children: [
-                                _ProfileHeader(
-                                  session: session,
-                                  isUpdating: isSavingName,
-                                ),
-                                const SizedBox(height: 32),
-                                _ProfileSection(
-                                  title: 'Twoje Konto',
-                                  children: [
-                                    _ProfileCard(
-                                      child: Column(
-                                        children: [
-                                          TextField(
-                                            controller: _firstNameController,
-                                            focusNode: _firstNameFocusNode,
-                                            enabled:
-                                                !isSavingName &&
-                                                activeAction == null,
-                                            decoration: InputDecoration(
-                                              labelText:
-                                                  l10n.firstNameFieldLabel,
-                                              prefixIcon: const Icon(
-                                                Icons.person_outline,
-                                              ),
-                                              border: InputBorder.none,
-                                              filled: false,
-                                            ),
-                                            onSubmitted:
-                                                (_) => _saveFirstName(
-                                                  context,
-                                                  session,
-                                                ),
-                                          ),
-                                          if (_hasUnsavedChanges(firstName))
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 8,
-                                              ),
-                                              child: FilledButton(
-                                                onPressed:
-                                                    !isSavingName &&
-                                                        activeAction == null
-                                                    ? () => _saveFirstName(
-                                                      context,
-                                                      session,
-                                                    )
-                                                    : null,
-                                                child: isSavingName
-                                                    ? _LoadingCircle()
-                                                    : Text(
-                                                      l10n.saveFirstNameButtonLabel,
-                                                    ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                    if (session.isAnonymousUser) ...[
-                                      const SizedBox(height: 12),
-                                      _ProfileTile(
-                                        onTap:
-                                            !isSavingName &&
-                                                activeAction == null
-                                            ? () async {
-                                              final r =
-                                                  await AppNavigator
-                                                      .goToRegister(context);
-                                              if (r == true &&
-                                                  context.mounted) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      l10n.accountSecuredSnackbar,
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                            }
-                                            : null,
-                                        icon: Icons.security,
-                                        title: l10n.registerButtonLabel,
-                                        subtitle: 'Zabezpiecz swoje dane',
-                                        isPrimary: true,
-                                      ),
-                                      const SizedBox(height: 12),
-                                      _ProfileTile(
-                                        onTap:
-                                            !isSavingName &&
-                                                activeAction == null
-                                            ? () => AppNavigator.goToLogin(
-                                              context,
-                                            )
-                                            : null,
-                                        icon: Icons.login,
-                                        title: l10n.loginButtonLabel,
-                                      ),
-                                    ],
-                                    if (!session.isAnonymousUser) ...[
-                                      const SizedBox(height: 12),
-                                      _ProfileTile(
-                                        onTap:
-                                            !isSavingName &&
-                                                activeAction == null
-                                            ? () => context
-                                                .read<AccountActionsCubit>()
-                                                .signOut()
-                                            : null,
-                                        icon: Icons.logout,
-                                        title: l10n.logoutButtonLabel,
-                                        trailing:
-                                            activeAction ==
-                                                    AccountAction.signOut
-                                                ? _LoadingCircle()
-                                                : null,
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                const SizedBox(height: 32),
-                                _ProfileSection(
-                                  title: 'Subskrypcja',
-                                  children: [
-                                    _SubscriptionCard(session: session),
-                                    if (!session.isProUser) ...[
-                                      const SizedBox(height: 12),
-                                      _ProfileTile(
-                                        onTap:
-                                            !isSavingName &&
-                                                activeAction == null &&
-                                                session.userIdOrNull != null
-                                            ? () => context
-                                                .read<AccountActionsCubit>()
-                                                .buyPro(session.userIdOrNull!)
-                                            : null,
-                                        icon: Icons.stars,
-                                        title: l10n.buyProButtonLabel,
-                                        isPrimary: true,
-                                        trailing:
-                                            activeAction == AccountAction.buyPro
-                                                ? _LoadingCircle()
-                                                : null,
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                const SizedBox(height: 32),
-                                _ProfileSection(
-                                  title: 'Pozostałe',
-                                  children: [
-                                    _ProfileTile(
-                                      onTap:
-                                          !isSavingName && activeAction == null
-                                              ? () => _confirmDeleteAccount(
-                                                context,
-                                              )
-                                              : null,
-                                      icon: Icons.delete_forever_outlined,
-                                      title: l10n.deleteAccountButtonLabel,
-                                      isDestructive: true,
-                                      trailing:
-                                          activeAction ==
-                                                  AccountAction.deleteAccount
-                                              ? _LoadingCircle()
-                                              : null,
-                                    ),
-                                  ],
-                                ),
-                                if (profileState.errorKey != null ||
-                                    accountState.errorKey != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 24),
-                                    child: SelectableText(
-                                      messageForErrorKey(
-                                        l10n,
-                                        profileState.errorKey ??
-                                            accountState.errorKey,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.error,
-                                      ),
-                                    ),
-                                  ),
-                              ],
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _ProfileHeaderBlock(
+                              session: session,
+                              isUpdating: isSavingName,
                             ),
-                          ),
+                            _sectionLabel(context, 'TWOJE KONTO'),
+                            _NameField(
+                              controller: _firstNameController,
+                              focusNode: _firstNameFocusNode,
+                              enabled: !isSavingName && activeAction == null,
+                              hasChanges: _hasUnsavedChanges(firstName),
+                              isSaving: isSavingName,
+                              onSave: () => _saveFirstName(context, session),
+                            ),
+                            if (session.isAnonymousUser) ...[
+                              _ProfileActionTile(
+                                enabled: !isSavingName && activeAction == null,
+                                icon: Icons.security,
+                                title: l10n.registerButtonLabel,
+                                subtitle: 'Zabezpiecz swoje dane',
+                                isPrimary: true,
+                                onTap: () async {
+                                  final r = await AppNavigator.goToRegister(context);
+                                  if (r == true && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(l10n.accountSecuredSnackbar),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                              _ProfileActionTile(
+                                enabled: !isSavingName && activeAction == null,
+                                icon: Icons.login,
+                                title: l10n.loginButtonLabel,
+                                onTap: () => AppNavigator.goToLogin(context),
+                              ),
+                            ],
+                            if (!session.isAnonymousUser)
+                              _ProfileActionTile(
+                                enabled: !isSavingName && activeAction == null,
+                                icon: Icons.logout,
+                                title: l10n.logoutButtonLabel,
+                                trailing: activeAction == AccountAction.signOut
+                                    ? const _Spinner()
+                                    : null,
+                                onTap: () => context
+                                    .read<AccountActionsCubit>()
+                                    .signOut(),
+                              ),
+                            const SizedBox(height: 8),
+                            _sectionLabel(context, 'SUBSKRYPCJA'),
+                            _SubscriptionRow(session: session),
+                            if (!session.isProUser)
+                              _ProfileActionTile(
+                                enabled: !isSavingName &&
+                                    activeAction == null &&
+                                    session.userIdOrNull != null,
+                                icon: Icons.stars_outlined,
+                                title: l10n.buyProButtonLabel,
+                                isPrimary: true,
+                                trailing:
+                                    activeAction == AccountAction.buyPro
+                                        ? const _Spinner()
+                                        : null,
+                                onTap: () => context
+                                    .read<AccountActionsCubit>()
+                                    .buyPro(session.userIdOrNull!),
+                              ),
+                            const SizedBox(height: 8),
+                            _sectionLabel(context, 'POZOSTAŁE'),
+                            _ProfileActionTile(
+                              enabled: !isSavingName && activeAction == null,
+                              icon: Icons.delete_outline,
+                              title: l10n.deleteAccountButtonLabel,
+                              isDestructive: true,
+                              trailing:
+                                  activeAction == AccountAction.deleteAccount
+                                      ? const _Spinner()
+                                      : null,
+                              onTap: () => _confirmDeleteAccount(context),
+                            ),
+                            if (profileState.errorKey != null ||
+                                accountState.errorKey != null)
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                                child: SelectableText(
+                                  messageForErrorKey(
+                                    l10n,
+                                    profileState.errorKey ??
+                                        accountState.errorKey,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.error,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 32),
+                          ],
                         ),
                       );
                     },
@@ -331,6 +249,28 @@ class _ProfileViewState extends State<_ProfileView> {
     );
   }
 
+  Widget _sectionLabel(BuildContext context, String text) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+      child: Row(
+        children: [
+          Container(width: 3, height: 12, color: theme.colorScheme.onSurface),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2.5,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   bool _hasUnsavedChanges(String firstName) {
     return _firstNameController.text.trim() != firstName.trim();
   }
@@ -338,23 +278,22 @@ class _ProfileViewState extends State<_ProfileView> {
   Future<bool> _confirmDiscardChanges(BuildContext context) async {
     final result = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(context.l10n.discardChangesTitle),
-            content: Text(context.l10n.discardChangesBody),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(context.l10n.stayButtonLabel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text(context.l10n.discardButtonLabel),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        shape: const RoundedRectangleBorder(),
+        title: Text(context.l10n.discardChangesTitle),
+        content: Text(context.l10n.discardChangesBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(context.l10n.stayButtonLabel),
           ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(context.l10n.discardButtonLabel),
+          ),
+        ],
+      ),
     );
-
     return result ?? false;
   }
 
@@ -362,27 +301,27 @@ class _ProfileViewState extends State<_ProfileView> {
     final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(l10n.deleteAccountDialogTitle),
-            content: Text(l10n.deleteAccountDialogBody),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(l10n.cancelButtonLabel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  foregroundColor: Theme.of(context).colorScheme.onError,
-                ),
-                child: Text(l10n.deleteAccountButtonLabel),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        shape: const RoundedRectangleBorder(),
+        title: Text(l10n.deleteAccountDialogTitle),
+        content: Text(l10n.deleteAccountDialogBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancelButtonLabel),
           ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+              shape: const RoundedRectangleBorder(),
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.deleteAccountButtonLabel),
+          ),
+        ],
+      ),
     );
-
     if (confirmed == true && context.mounted) {
       context.read<AccountActionsCubit>().deleteAccount();
     }
@@ -391,17 +330,18 @@ class _ProfileViewState extends State<_ProfileView> {
   void _saveFirstName(BuildContext context, SessionState session) {
     final userId = session.userIdOrNull;
     if (userId == null) return;
-
     FocusScope.of(context).unfocus();
     context.read<ProfileCubit>().saveFirstName(
-      userId: userId,
-      firstName: _firstNameController.text,
-    );
+          userId: userId,
+          firstName: _firstNameController.text,
+        );
   }
 }
 
-class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({required this.session, required this.isUpdating});
+// ─── Header block ──────────────────────────────────────────────────────────
+
+class _ProfileHeaderBlock extends StatelessWidget {
+  const _ProfileHeaderBlock({required this.session, required this.isUpdating});
 
   final SessionState session;
   final bool isUpdating;
@@ -410,277 +350,77 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final sharedUser = session.sharedUserOrNull;
-    final initials =
-        (sharedUser?.firstName?.isNotEmpty ?? false)
-            ? sharedUser!.firstName![0].toUpperCase()
-            : '?';
-
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary,
-                    theme.colorScheme.tertiary,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  initials,
-                  style: theme.textTheme.displayMedium?.copyWith(
-                    color: theme.colorScheme.onPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            if (isUpdating)
-              const SizedBox(
-                width: 110,
-                height: 110,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Text(
-          session.emailOrNull ?? 'Użytkownik Gość',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        if (session.isAnonymousUser)
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Text(
-              'Konto tymczasowe',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.secondary,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _ProfileSection extends StatelessWidget {
-  const _ProfileSection({required this.title, required this.children});
-
-  final String title;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8, bottom: 8),
-          child: Text(
-            title.toUpperCase(),
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        ...children,
-      ],
-    );
-  }
-}
-
-class _ProfileCard extends StatelessWidget {
-  const _ProfileCard({required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-      ),
-      child: Padding(padding: const EdgeInsets.all(12), child: child),
-    );
-  }
-}
-
-class _ProfileTile extends StatelessWidget {
-  const _ProfileTile({
-    required this.icon,
-    required this.title,
-    this.subtitle,
-    this.onTap,
-    this.isDestructive = false,
-    this.isPrimary = false,
-    this.trailing,
-  });
-
-  final IconData icon;
-  final String title;
-  final String? subtitle;
-  final VoidCallback? onTap;
-  final bool isDestructive;
-  final bool isPrimary;
-  final Widget? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color =
-        isDestructive
-            ? theme.colorScheme.error
-            : isPrimary
-            ? theme.colorScheme.primary
-            : theme.colorScheme.onSurface;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color:
-              isPrimary
-                  ? theme.colorScheme.primaryContainer.withOpacity(0.3)
-                  : theme.colorScheme.surfaceContainerLow,
-          border: Border.all(
-            color:
-                isPrimary
-                    ? theme.colorScheme.primary.withOpacity(0.2)
-                    : theme.colorScheme.outlineVariant,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: color,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (subtitle != null)
-                    Text(
-                      subtitle!,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            if (trailing != null) trailing! else const Icon(Icons.chevron_right),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SubscriptionCard extends StatelessWidget {
-  const _SubscriptionCard({required this.session});
-  final SessionState session;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isPro = session.isProUser;
+    final initials = (sharedUser?.firstName?.isNotEmpty ?? false)
+        ? sharedUser!.firstName![0].toUpperCase()
+        : '?';
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors:
-              isPro
-                  ? [theme.colorScheme.primary, theme.colorScheme.tertiary]
-                  : [
-                    theme.colorScheme.surfaceContainerHighest,
-                    theme.colorScheme.surfaceContainerLow,
-                  ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        border: Border(
+          bottom: BorderSide(color: theme.dividerColor, width: 1),
         ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow:
-            isPro
-                ? [
-                  BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ]
-                : null,
       ),
       child: Row(
         children: [
-          Icon(
-            isPro ? Icons.workspace_premium : Icons.stars_outlined,
-            size: 48,
-            color: isPro ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+          // Monogram square
+          Stack(
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                color: theme.colorScheme.onSurface,
+                child: Center(
+                  child: Text(
+                    initials,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: theme.scaffoldBackgroundColor,
+                      letterSpacing: -1,
+                    ),
+                  ),
+                ),
+              ),
+              if (isUpdating)
+                const Positioned.fill(
+                  child: Center(
+                    child: SizedBox(
+                      width: 72,
+                      height: 72,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isPro ? 'MobiScan PRO' : 'MobiScan FREE',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color:
-                        isPro
-                            ? theme.colorScheme.onPrimary
-                            : theme.colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
+                  session.emailOrNull ?? 'Użytkownik Gość',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
-                Text(
-                  isPro
-                      ? 'Wszystkie funkcje odblokowane'
-                      : 'Odblokuj pełną moc skanowania',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color:
-                        isPro
-                            ? theme.colorScheme.onPrimary.withOpacity(0.8)
-                            : theme.colorScheme.onSurfaceVariant,
+                if (session.isAnonymousUser)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      'KONTO TYMCZASOWE',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 2,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                      ),
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -690,7 +430,244 @@ class _SubscriptionCard extends StatelessWidget {
   }
 }
 
-class _LoadingCircle extends StatelessWidget {
+// ─── Name field ────────────────────────────────────────────────────────────
+
+class _NameField extends StatelessWidget {
+  const _NameField({
+    required this.controller,
+    required this.focusNode,
+    required this.enabled,
+    required this.hasChanges,
+    required this.isSaving,
+    required this.onSave,
+  });
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool enabled;
+  final bool hasChanges;
+  final bool isSaving;
+  final VoidCallback onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: [
+          TextField(
+            controller: controller,
+            focusNode: focusNode,
+            enabled: enabled,
+            decoration: InputDecoration(
+              labelText: l10n.firstNameFieldLabel,
+              prefixIcon: Icon(
+                Icons.person_outline,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(color: theme.dividerColor, width: 1.5),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(color: theme.dividerColor, width: 1.5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide:
+                    BorderSide(color: theme.colorScheme.onSurface, width: 1.5),
+              ),
+              filled: true,
+              fillColor: theme.cardTheme.color,
+            ),
+            onSubmitted: (_) => onSave(),
+          ),
+          if (hasChanges)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: !isSaving ? onSave : null,
+                  child: isSaving
+                      ? const _Spinner()
+                      : Text(l10n.saveFirstNameButtonLabel),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Subscription row ──────────────────────────────────────────────────────
+
+class _SubscriptionRow extends StatelessWidget {
+  const _SubscriptionRow({required this.session});
+
+  final SessionState session;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isPro = session.isProUser;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: isPro
+          ? BoxDecoration(
+              color: theme.colorScheme.onSurface,
+              border: Border.all(color: theme.colorScheme.onSurface, width: 1.5),
+            )
+          : BoxDecoration(
+              color: theme.cardTheme.color,
+              border: Border.all(color: theme.dividerColor, width: 1.5),
+            ),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          Icon(
+            isPro ? Icons.workspace_premium : Icons.stars_outlined,
+            size: 36,
+            color: isPro ? theme.scaffoldBackgroundColor : theme.colorScheme.onSurface,
+          ),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isPro ? 'MobiScan PRO' : 'MobiScan FREE',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  color: isPro
+                      ? theme.scaffoldBackgroundColor
+                      : theme.colorScheme.onSurface,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              Text(
+                isPro
+                    ? 'Wszystkie funkcje odblokowane'
+                    : 'Odblokuj pełną moc skanowania',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isPro
+                      ? theme.scaffoldBackgroundColor.withValues(alpha: 0.65)
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.45),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Action tile ──────────────────────────────────────────────────────────
+
+class _ProfileActionTile extends StatelessWidget {
+  const _ProfileActionTile({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    required this.enabled,
+    this.subtitle,
+    this.isDestructive = false,
+    this.isPrimary = false,
+    this.trailing,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final VoidCallback? onTap;
+  final bool enabled;
+  final bool isDestructive;
+  final bool isPrimary;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = isDestructive
+        ? theme.colorScheme.error
+        : theme.colorScheme.onSurface;
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: enabled ? onTap : null,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Row(
+              children: [
+                // Left border accent for primary actions
+                if (isPrimary)
+                  Container(
+                    width: 3,
+                    height: 32,
+                    color: theme.colorScheme.onSurface,
+                    margin: const EdgeInsets.only(right: 12),
+                  ),
+                Icon(
+                  icon,
+                  size: 22,
+                  color: enabled
+                      ? color
+                      : color.withValues(alpha: 0.35),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: enabled
+                              ? color
+                              : color.withValues(alpha: 0.35),
+                        ),
+                      ),
+                      if (subtitle != null)
+                        Text(
+                          subtitle!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                trailing ??
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 16,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                    ),
+              ],
+            ),
+          ),
+        ),
+        Divider(height: 1, color: theme.dividerColor, indent: 20, endIndent: 20),
+      ],
+    );
+  }
+}
+
+// ─── Spinner ──────────────────────────────────────────────────────────────
+
+class _Spinner extends StatelessWidget {
+  const _Spinner();
+
   @override
   Widget build(BuildContext context) {
     return const SizedBox(

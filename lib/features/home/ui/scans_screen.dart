@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/navigation/app_navigator.dart';
-import '../../../core/design/app_design_system.dart';
 import '../../../l10n/l10n.dart';
 import '../../documents/presentation/cubit/document_list_cubit.dart';
 import '../../documents/models/document_model.dart';
@@ -33,28 +32,46 @@ class _ScansScreenState extends State<ScansScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(l10n.navMyScans),
+        title: Text(
+          l10n.navMyScans.toUpperCase(),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 3,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
         backgroundColor: theme.scaffoldBackgroundColor,
         scrolledUnderElevation: 0,
-        actions: [
-          _SortMenu(),
-        ],
+        actions: [_SortMenu()],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Divider(height: 1, color: theme.dividerColor),
+        ),
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: TextField(
               controller: _searchController,
-              onChanged: (value) => context.read<DocumentListCubit>().updateSearch(value),
-              style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+              onChanged: (value) =>
+                  context.read<DocumentListCubit>().updateSearch(value),
+              style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
                 hintText: l10n.searchScansPlaceholder,
-                hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.5)),
-                prefixIcon: Icon(Icons.search_rounded, size: 20, color: theme.colorScheme.primary),
+                hintStyle: TextStyle(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
+                  fontSize: 14,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  size: 20,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear_rounded, size: 20),
+                        icon: const Icon(Icons.clear, size: 18),
                         onPressed: () {
                           _searchController.clear();
                           context.read<DocumentListCubit>().updateSearch('');
@@ -63,22 +80,25 @@ class _ScansScreenState extends State<ScansScreen> {
                     : null,
                 filled: true,
                 fillColor: theme.cardTheme.color,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: theme.dividerColor),
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: theme.dividerColor, width: 1.5),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: theme.dividerColor),
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: theme.dividerColor, width: 1.5),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
+                  borderRadius: BorderRadius.zero,
+                  borderSide:
+                      BorderSide(color: theme.colorScheme.onSurface, width: 1.5),
                 ),
               ),
             ),
           ),
+          const SizedBox(height: 12),
           Expanded(
             child: BlocBuilder<DocumentListCubit, DocumentListState>(
               builder: (context, state) {
@@ -91,7 +111,8 @@ class _ScansScreenState extends State<ScansScreen> {
                       : _ScansList(documents: state.filteredDocuments),
                   Error() => _ErrorView(
                       l10n: l10n,
-                      onRetry: () => context.read<DocumentListCubit>().retry(widget.userId),
+                      onRetry: () =>
+                          context.read<DocumentListCubit>().retry(widget.userId),
                     ),
                   _ => const Center(child: CircularProgressIndicator()),
                 };
@@ -107,12 +128,14 @@ class _ScansScreenState extends State<ScansScreen> {
 class _SortMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BlocBuilder<DocumentListCubit, DocumentListState>(
       builder: (context, state) {
         final currentOrder = state.sortOrder;
         return PopupMenuButton<DocumentSortOrder>(
-          icon: const Icon(Icons.sort_rounded),
-          onSelected: (order) => context.read<DocumentListCubit>().updateSort(order),
+          icon: Icon(Icons.sort, color: theme.colorScheme.onSurface),
+          onSelected: (order) =>
+              context.read<DocumentListCubit>().updateSort(order),
           itemBuilder: (context) => [
             CheckedPopupMenuItem(
               value: DocumentSortOrder.dateDesc,
@@ -156,35 +179,30 @@ class _EmptyScansView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Icon(
-                isSearch ? Icons.search_off_rounded : Icons.description_outlined,
-                size: 40,
-                color: theme.colorScheme.primary,
-              ),
+            Icon(
+              isSearch ? Icons.search_off : Icons.description_outlined,
+              size: 56,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
             ),
             const SizedBox(height: 20),
             Text(
-              isSearch ? "Brak wyników" : l10n.noScansTitle,
+              isSearch ? 'BRAK WYNIKÓW' : l10n.noScansTitle.toUpperCase(),
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: theme.textTheme.titleLarge?.color,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 3,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              isSearch ? "Nie znaleźliśmy skanów pasujących do Twojego zapytania." : l10n.noScansBody,
+              isSearch
+                  ? 'Nie znaleźliśmy skanów pasujących do Twojego zapytania.'
+                  : l10n.noScansBody,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
-                fontSize: 15,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                fontSize: 14,
               ),
             ),
           ],
@@ -202,15 +220,11 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SelectableText(
-            l10n.errorUnknown,
-            style: TextStyle(color: theme.textTheme.bodyMedium?.color),
-          ),
+          SelectableText(l10n.errorUnknown),
           const SizedBox(height: 16),
           FilledButton(
             onPressed: onRetry,
@@ -229,88 +243,84 @@ class _ScansList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+    return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 100),
       itemCount: documents.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final doc = documents[index];
-        return _ScanCard(document: doc);
+        return _ScanRow(document: doc);
       },
     );
   }
 }
 
-class _ScanCard extends StatelessWidget {
-  const _ScanCard({required this.document});
+class _ScanRow extends StatelessWidget {
+  const _ScanRow({required this.document});
 
   final DocumentModel document;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: () => AppNavigator.goToDocumentDetail(context, document),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: AppDesignSystem.cardDecoration(color: theme.cardTheme.color),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.article_rounded,
-                color: theme.colorScheme.primary,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    document.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                      color: theme.textTheme.bodyLarge?.color,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => AppNavigator.goToDocumentDetail(context, document),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.article_outlined,
+                  size: 22,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        document.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${document.pages.length} str  ·  ${document.createdAt.toLocal().toString().substring(0, 10)}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          letterSpacing: 0.3,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    '${document.pages.length} stron · ${document.createdAt.toLocal().toString().substring(0, 10)}',
-                    style: TextStyle(
-                      color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-                      fontSize: 12,
-                    ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: theme.colorScheme.error.withValues(alpha: 0.6),
+                    size: 20,
                   ),
-                ],
-              ),
+                  onPressed: () => _showDeleteConfirmation(context),
+                ),
+                Icon(
+                  Icons.arrow_forward,
+                  size: 16,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                ),
+              ],
             ),
-            IconButton(
-              icon: Icon(
-                Icons.delete_outline_rounded,
-                color: theme.colorScheme.error.withValues(alpha: 0.7),
-                size: 20,
-              ),
-              onPressed: () => _showDeleteConfirmation(context),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: theme.iconTheme.color?.withValues(alpha: 0.4),
-              size: 20,
-            ),
-          ],
+          ),
         ),
-      ),
+        Divider(height: 1, color: theme.dividerColor, indent: 20, endIndent: 20),
+      ],
     );
   }
 
@@ -319,6 +329,7 @@ class _ScanCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (diagContext) => AlertDialog(
+        shape: const RoundedRectangleBorder(),
         title: Text(l10n.deleteDocumentDialogTitle,
             style: const TextStyle(fontWeight: FontWeight.w700)),
         content: Text(l10n.deleteDocumentDialogBody),

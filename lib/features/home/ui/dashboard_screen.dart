@@ -19,24 +19,24 @@ class DashboardScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const _LogoTitle(),
-        backgroundColor: theme.scaffoldBackgroundColor,
-        scrolledUnderElevation: 0,
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 8),
               _GreetingSection(l10n: l10n),
               const SizedBox(height: 24),
-              _StatsCard(l10n: l10n),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _StatsRow(l10n: l10n),
+              ),
               const SizedBox(height: 24),
-              _ScanButton(userId: userId, l10n: l10n),
-              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _ScanButton(userId: userId, l10n: l10n),
+              ),
+              const SizedBox(height: 32),
               _RecentScansSection(l10n: l10n, userId: userId),
             ],
           ),
@@ -46,37 +46,8 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-class _LogoTitle extends StatelessWidget {
-  const _LogoTitle();
+// ─── Greeting ─────────────────────────────────────────────────────────────
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            gradient: AppDesignSystem.primaryGradient,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(Icons.document_scanner_rounded, size: 18, color: Colors.white),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          'MobiScan',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            color: theme.textTheme.titleLarge?.color ?? const Color(0xFF111827),
-            letterSpacing: -0.5,
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 class _GreetingSection extends StatelessWidget {
   const _GreetingSection({required this.l10n});
@@ -86,33 +57,41 @@ class _GreetingSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.dashboardGreeting,
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            color: theme.textTheme.headlineLarge?.color ?? const Color(0xFF111827),
-            letterSpacing: -0.5,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.dashboardGreeting,
+            style: TextStyle(
+              fontSize: 42,
+              fontWeight: FontWeight.w900,
+              color: theme.colorScheme.onSurface,
+              letterSpacing: -2,
+              height: 1.0,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          l10n.dashboardGreetingSubtitle,
-          style: TextStyle(
-            fontSize: 15,
-            color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6) ?? AppDesignSystem.textSecondary,
+          const SizedBox(height: 8),
+          Text(
+            l10n.dashboardGreetingSubtitle.toUpperCase(),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 2.5,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class _StatsCard extends StatelessWidget {
-  const _StatsCard({required this.l10n});
+// ─── Stats ────────────────────────────────────────────────────────────────
+
+class _StatsRow extends StatelessWidget {
+  const _StatsRow({required this.l10n});
 
   final AppLocalizations l10n;
 
@@ -123,40 +102,41 @@ class _StatsCard extends StatelessWidget {
       builder: (context, state) {
         final count = state is list_cubit.Success ? state.documents.length : 0;
         return Container(
+          decoration: AppDesignSystem.accentLeftBorder(
+            bg: theme.cardTheme.color,
+          ),
           padding: const EdgeInsets.all(20),
-          decoration: AppDesignSystem.cardDecoration(color: theme.cardTheme.color),
           child: Row(
             children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  gradient: AppDesignSystem.primaryGradient,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.folder_copy_rounded, color: Colors.white, size: 26),
-              ),
-              const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '$count',
                     style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      color: theme.textTheme.displaySmall?.color ?? const Color(0xFF111827),
-                      letterSpacing: -1,
+                      fontSize: 48,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -2,
+                      color: theme.colorScheme.onSurface,
+                      height: 1.0,
                     ),
                   ),
                   Text(
-                    l10n.dashboardTotalScans,
+                    l10n.dashboardTotalScans.toUpperCase(),
                     style: TextStyle(
-                      fontSize: 13,
-                      color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? AppDesignSystem.textSecondary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(width: 20),
+              Icon(
+                Icons.description_outlined,
+                size: 36,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
               ),
             ],
           ),
@@ -165,6 +145,8 @@ class _StatsCard extends StatelessWidget {
     );
   }
 }
+
+// ─── Scan button ──────────────────────────────────────────────────────────
 
 class _ScanButton extends StatelessWidget {
   const _ScanButton({required this.userId, required this.l10n});
@@ -174,47 +156,44 @@ class _ScanButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BlocBuilder<scanner_cubit.DocumentScannerCubit, scanner_cubit.DocumentScannerState>(
       builder: (context, state) {
         final isSaving = state is scanner_cubit.Saving;
         final isScanning = state is scanner_cubit.Scanning;
         final isLoading = isSaving || isScanning;
-        return Container(
+        return SizedBox(
           width: double.infinity,
           height: 56,
-          decoration: BoxDecoration(
-            gradient: AppDesignSystem.primaryGradient,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: AppDesignSystem.primary.withValues(alpha: 0.3),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
           child: ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: theme.colorScheme.onSurface,
+              foregroundColor: theme.scaffoldBackgroundColor,
+              shape: const RoundedRectangleBorder(),
+              elevation: 0,
             ),
             onPressed: isLoading
                 ? null
                 : () => context.read<scanner_cubit.DocumentScannerCubit>().startScan(userId),
             icon: isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: theme.scaffoldBackgroundColor,
+                    ),
                   )
-                : const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+                : Icon(Icons.add, color: theme.scaffoldBackgroundColor, size: 22),
             label: Text(
-              isSaving ? l10n.savingLabel : l10n.dashboardStartScan,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
+              isSaving
+                  ? l10n.savingLabel.toUpperCase()
+                  : l10n.dashboardStartScan.toUpperCase(),
+              style: TextStyle(
+                color: theme.scaffoldBackgroundColor,
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
+                letterSpacing: 2,
               ),
             ),
           ),
@@ -223,6 +202,8 @@ class _ScanButton extends StatelessWidget {
     );
   }
 }
+
+// ─── Recent scans ─────────────────────────────────────────────────────────
 
 class _RecentScansSection extends StatelessWidget {
   const _RecentScansSection({required this.l10n, required this.userId});
@@ -238,63 +219,91 @@ class _RecentScansSection extends StatelessWidget {
         if (state is! list_cubit.Success || state.documents.isEmpty) {
           return const SizedBox.shrink();
         }
-        final recent = state.documents.take(3).toList();
+        final recent = state.documents.take(5).toList();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.dashboardRecentScans,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: theme.textTheme.titleMedium?.color ?? const Color(0xFF111827),
-              ),
-            ),
-            const SizedBox(height: 12),
-            ...recent.map(
-              (doc) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: GestureDetector(
-                  onTap: () => AppNavigator.goToDocumentDetail(context, doc),
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: AppDesignSystem.cardDecoration(color: theme.cardTheme.color),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(Icons.article_rounded,
-                              color: theme.colorScheme.primary, size: 20),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            doc.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: theme.textTheme.bodyLarge?.color ?? const Color(0xFF111827),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Icon(Icons.chevron_right_rounded,
-                            color: theme.iconTheme.color?.withValues(alpha: 0.5) ?? AppDesignSystem.textSecondary, size: 20),
-                      ],
-                    ),
-                  ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              child: Text(
+                l10n.dashboardRecentScans.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2.5,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
               ),
+            ),
+            ...recent.map(
+              (doc) => _RecentScanRow(doc: doc),
             ),
           ],
         );
       },
+    );
+  }
+}
+
+class _RecentScanRow extends StatelessWidget {
+  const _RecentScanRow({required this.doc});
+
+  final dynamic doc;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: () => AppNavigator.goToDocumentDetail(context, doc),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: theme.dividerColor,
+              width: 1,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    doc.name as String,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    (doc.createdAt as DateTime)
+                        .toLocal()
+                        .toString()
+                        .substring(0, 10),
+                    style: TextStyle(
+                      fontSize: 11,
+                      letterSpacing: 0.5,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward,
+              size: 18,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
