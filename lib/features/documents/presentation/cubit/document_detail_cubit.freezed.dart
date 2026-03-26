@@ -125,12 +125,12 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( String? successKey)?  success,TResult Function( String errorKey)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( String? successKey,  String? newName)?  success,TResult Function( String errorKey)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case Initial() when initial != null:
 return initial();case Loading() when loading != null:
 return loading();case Success() when success != null:
-return success(_that.successKey);case Error() when error != null:
+return success(_that.successKey,_that.newName);case Error() when error != null:
 return error(_that.errorKey);case _:
   return orElse();
 
@@ -149,12 +149,12 @@ return error(_that.errorKey);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( String? successKey)  success,required TResult Function( String errorKey)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( String? successKey,  String? newName)  success,required TResult Function( String errorKey)  error,}) {final _that = this;
 switch (_that) {
 case Initial():
 return initial();case Loading():
 return loading();case Success():
-return success(_that.successKey);case Error():
+return success(_that.successKey,_that.newName);case Error():
 return error(_that.errorKey);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -169,12 +169,12 @@ return error(_that.errorKey);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( String? successKey)?  success,TResult? Function( String errorKey)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( String? successKey,  String? newName)?  success,TResult? Function( String errorKey)?  error,}) {final _that = this;
 switch (_that) {
 case Initial() when initial != null:
 return initial();case Loading() when loading != null:
 return loading();case Success() when success != null:
-return success(_that.successKey);case Error() when error != null:
+return success(_that.successKey,_that.newName);case Error() when error != null:
 return error(_that.errorKey);case _:
   return null;
 
@@ -251,10 +251,11 @@ String toString() {
 
 
 class Success implements DocumentDetailState {
-  const Success({this.successKey});
+  const Success({this.successKey, this.newName});
   
 
  final  String? successKey;
+ final  String? newName;
 
 /// Create a copy of DocumentDetailState
 /// with the given fields replaced by the non-null parameter values.
@@ -266,16 +267,16 @@ $SuccessCopyWith<Success> get copyWith => _$SuccessCopyWithImpl<Success>(this, _
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Success&&(identical(other.successKey, successKey) || other.successKey == successKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Success&&(identical(other.successKey, successKey) || other.successKey == successKey)&&(identical(other.newName, newName) || other.newName == newName));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,successKey);
+int get hashCode => Object.hash(runtimeType,successKey,newName);
 
 @override
 String toString() {
-  return 'DocumentDetailState.success(successKey: $successKey)';
+  return 'DocumentDetailState.success(successKey: $successKey, newName: $newName)';
 }
 
 
@@ -286,7 +287,7 @@ abstract mixin class $SuccessCopyWith<$Res> implements $DocumentDetailStateCopyW
   factory $SuccessCopyWith(Success value, $Res Function(Success) _then) = _$SuccessCopyWithImpl;
 @useResult
 $Res call({
- String? successKey
+ String? successKey, String? newName
 });
 
 
@@ -303,9 +304,10 @@ class _$SuccessCopyWithImpl<$Res>
 
 /// Create a copy of DocumentDetailState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? successKey = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? successKey = freezed,Object? newName = freezed,}) {
   return _then(Success(
 successKey: freezed == successKey ? _self.successKey : successKey // ignore: cast_nullable_to_non_nullable
+as String?,newName: freezed == newName ? _self.newName : newName // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

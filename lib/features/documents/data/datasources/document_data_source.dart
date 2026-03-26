@@ -9,6 +9,8 @@ abstract class DocumentDataSource {
   Future<void> deleteDocument(String id);
   Future<void> addPage(Map<String, dynamic> page);
   Future<void> deletePage(String id);
+  Future<List<Map<String, dynamic>>> getDocuments(String userId);
+  Future<List<Map<String, dynamic>>> getPages(String documentId);
 }
 
 @LazySingleton(as: DocumentDataSource)
@@ -63,5 +65,25 @@ class SupabaseDocumentDataSource implements DocumentDataSource {
   @override
   Future<void> deletePage(String id) async {
     await _supabaseClient.from('mobiscan_pages').delete().eq('id', id);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getDocuments(String userId) async {
+    final response = await _supabaseClient
+        .from('mobiscan_documents')
+        .select()
+        .eq('user_id', userId)
+        .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getPages(String documentId) async {
+    final response = await _supabaseClient
+        .from('mobiscan_pages')
+        .select()
+        .eq('document_id', documentId)
+        .order('page_index', ascending: true);
+    return List<Map<String, dynamic>>.from(response);
   }
 }

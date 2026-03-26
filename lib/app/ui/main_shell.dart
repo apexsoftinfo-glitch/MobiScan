@@ -29,16 +29,8 @@ class _MainShellState extends State<MainShell> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) =>
-              getIt<list_cubit.DocumentListCubit>()..loadDocuments(userId),
-        ),
-        BlocProvider(
-          create: (context) => getIt<scanner_cubit.DocumentScannerCubit>(),
-        ),
-      ],
+    return BlocProvider(
+      create: (context) => getIt<scanner_cubit.DocumentScannerCubit>(),
       child: BlocListener<scanner_cubit.DocumentScannerCubit, scanner_cubit.DocumentScannerState>(
         listener: (context, state) {
           if (state is scanner_cubit.Success) {

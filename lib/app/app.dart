@@ -8,6 +8,10 @@ import 'router/app_gate.dart';
 import 'session/presentation/cubit/session_cubit.dart';
 import 'theme/theme_cubit.dart';
 import 'ui/missing_supabase_keys_screen.dart';
+import 'ui/splash_screen.dart';
+import '../features/documents/presentation/cubit/document_list_cubit.dart';
+
+
 
 class App extends StatelessWidget {
   const App({required this.hasSupabaseKeys, super.key});
@@ -158,18 +162,72 @@ class App extends StatelessWidget {
   }
 }
 
-class _AppShell extends StatelessWidget {
+
+class _AppShell extends StatefulWidget {
   const _AppShell({required this.hasSupabaseKeys});
 
   final bool hasSupabaseKeys;
 
   @override
+  State<_AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<_AppShell> {
+  bool _showSplash = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _startSplashTimer();
+  }
+
+  Future<void> _startSplashTimer() async {
+    await Future.delayed(const Duration(milliseconds: 2500));
+    if (mounted) {
+      setState(() {
+        _showSplash = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return hasSupabaseKeys
-        ? BlocProvider<SessionCubit>.value(
+    if (widget.hasSupabaseKeys) {
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider<SessionCubit>.value(
             value: GetIt.I<SessionCubit>(),
-            child: const SessionNavigationObserver(child: AppGate()),
-          )
-        : const MissingSupabaseKeysScreen();
+          ),
+          BlocProvider<DocumentListCubit>.value(
+            value: GetIt.I<DocumentListCubit>(),
+          ),
+        ],
+        child: BlocListener<SessionCubit, SessionState>(
+          listenWhen: (prev, next) =>
+              prev.userIdOrNull == null && next.userIdOrNull != null,
+          listener: (context, state) {
+            final userId = state.userIdOrNull;
+            if (userId != null) {
+              context.read<DocumentListCubit>().loadDocuments(userId);
+            }
+          },
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 600),
+            child: _showSplash
+                ? const ScanningSplashScreen(key: ValueKey('splash'))
+                : _buildMainContent(),
+          ),
+        ),
+      );
+    } else {
+      return const MissingSupabaseKeysScreen();
+    }
+  }
+
+  Widget _buildMainContent() {
+    return const SessionNavigationObserver(
+      key: ValueKey('main'),
+      child: AppGate(),
+    );
   }
 }

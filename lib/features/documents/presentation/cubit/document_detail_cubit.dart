@@ -11,6 +11,7 @@ sealed class DocumentDetailState with _$DocumentDetailState {
   const factory DocumentDetailState.loading() = Loading;
   const factory DocumentDetailState.success({
     String? successKey,
+    String? newName,
   }) = Success;
   const factory DocumentDetailState.error({
     required String errorKey,
@@ -29,7 +30,7 @@ class DocumentDetailCubit extends Cubit<DocumentDetailState> {
     emit(const DocumentDetailState.loading());
     try {
       await _documentRepository.updateDocumentName(id: id, name: newName.trim());
-      emit(const DocumentDetailState.success(successKey: 'document_renamed'));
+      emit(DocumentDetailState.success(successKey: 'document_renamed', newName: newName.trim()));
     } catch (e) {
       emit(const DocumentDetailState.error(errorKey: 'unknown_error'));
     }

@@ -51,6 +51,51 @@ class _ProfileViewState extends State<_ProfileView> {
     super.dispose();
   }
 
+  void _showTopSuccess(BuildContext context, String message) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearMaterialBanners();
+    messenger.showMaterialBanner(
+      MaterialBanner(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        backgroundColor: const Color(0xFF4CAF50),
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: messenger.clearMaterialBanners,
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        messenger.clearMaterialBanners();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final session = context.watch<SessionCubit>().state;
@@ -69,9 +114,7 @@ class _ProfileViewState extends State<_ProfileView> {
         BlocListener<ProfileCubit, ProfileState>(
           listener: (context, state) {
             if (state.successKey == 'profile_saved') {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.profileSavedSnackbar)),
-              );
+              _showTopSuccess(context, l10n.profileSavedSnackbar);
               context.read<ProfileCubit>().clearFeedback();
             }
           },
@@ -79,15 +122,11 @@ class _ProfileViewState extends State<_ProfileView> {
         BlocListener<AccountActionsCubit, AccountActionsState>(
           listener: (context, state) {
             if (state.successKey == 'pro_enabled') {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.proEnabledSnackbar)),
-              );
+              _showTopSuccess(context, l10n.proEnabledSnackbar);
               context.read<AccountActionsCubit>().clearFeedback();
             }
             if (state.successKey == 'account_deleted') {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.accountDeletedSnackbar)),
-              );
+              _showTopSuccess(context, l10n.accountDeletedSnackbar);
               context.read<AccountActionsCubit>().clearFeedback();
             }
           },

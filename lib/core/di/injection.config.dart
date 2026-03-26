@@ -50,6 +50,9 @@ import 'package:myapp/features/profiles/data/repositories/shared_user_repository
     as _i636;
 import 'package:myapp/features/profiles/presentation/cubit/profile_cubit.dart'
     as _i463;
+import 'package:myapp/features/settings/data/backup_repository.dart' as _i532;
+import 'package:myapp/features/settings/presentation/cubit/backup_cubit.dart'
+    as _i936;
 import 'package:myapp/features/subscription/data/datasources/subscription_data_source.dart'
     as _i138;
 import 'package:myapp/features/subscription/data/repositories/subscription_repository.dart'
@@ -106,6 +109,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i368.DocumentRepository>(
       () => _i368.DocumentRepositoryImpl(gh<_i308.DocumentDataSource>()),
     );
+    gh.lazySingleton<_i532.BackupRepository>(
+      () => _i532.BackupRepositoryImpl(gh<_i368.DocumentRepository>()),
+    );
     gh.lazySingleton<_i526.SessionRepository>(
       () => _i526.SessionRepositoryImpl(
         gh<_i37.AuthRepository>(),
@@ -116,7 +122,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i300.DocumentDetailCubit>(
       () => _i300.DocumentDetailCubit(gh<_i368.DocumentRepository>()),
     );
-    gh.factory<_i112.DocumentListCubit>(
+    gh.lazySingleton<_i112.DocumentListCubit>(
       () => _i112.DocumentListCubit(gh<_i368.DocumentRepository>()),
     );
     gh.factory<_i918.LoginCubit>(
@@ -127,6 +133,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i491.WelcomeCubit>(
       () => _i491.WelcomeCubit(gh<_i37.AuthRepository>()),
+    );
+    gh.factory<_i936.BackupCubit>(
+      () => _i936.BackupCubit(gh<_i532.BackupRepository>()),
     );
     gh.factory<_i756.DocumentScannerCubit>(
       () => _i756.DocumentScannerCubit(

@@ -1,11 +1,11 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../../../../core/di/injection.dart';
-import '../../../../core/design/app_design_system.dart';
 import '../../../../l10n/l10n.dart';
 import '../../models/document_model.dart';
 import '../cubit/document_detail_cubit.dart';
@@ -18,7 +18,6 @@ class DocumentDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final theme = Theme.of(context);
 
     return MultiBlocProvider(
       providers: [
@@ -34,12 +33,46 @@ class DocumentDetailScreen extends StatelessWidget {
                   if (s.successKey == 'document_deleted') {
                     Navigator.of(context).pop();
                   } else if (s.successKey == 'document_renamed') {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.documentRenamedSnackbar),
-                        backgroundColor: theme.colorScheme.secondary,
+                    final messenger = ScaffoldMessenger.of(context);
+                    messenger.showMaterialBanner(
+                      MaterialBanner(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                        backgroundColor: const Color(0xFF4CAF50),
+                        content: Row(
+                          children: [
+                            const Icon(Icons.check_circle_outline,
+                                color: Colors.white, size: 18),
+                            const SizedBox(width: 10),
+                            Text(
+                              l10n.documentRenamedSnackbar,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: messenger.clearMaterialBanners,
+                            child: const Text(
+                              'OK',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     );
+                    Future.delayed(const Duration(milliseconds: 2500), () {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).clearMaterialBanners();
+                      }
+                    });
                   }
                 },
                 error: (_) {
@@ -84,11 +117,19 @@ class _DocumentDetailView extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          document.name,
-          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        title: BlocBuilder<DocumentDetailCubit, DocumentDetailState>(
+          builder: (context, state) {
+            final newName = state.maybeMap(
+              success: (s) => s.newName,
+              orElse: () => null,
+            );
+            return Text(
+              newName ?? document.name,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            );
+          },
         ),
         backgroundColor: theme.appBarTheme.backgroundColor,
         scrolledUnderElevation: 0,
@@ -201,78 +242,223 @@ class _DocumentDetailView extends StatelessWidget {
   }
 }
 
-class _ExportButton extends StatelessWidget {
+class _ExportButton extends StatefulWidget {
   const _ExportButton({required this.document});
-
   final DocumentModel document;
+
+  @override
+  State<_ExportButton> createState() => _ExportButtonState();
+}
+
+class _ExportButtonState extends State<_ExportButton>
+    with TickerProviderStateMixin {
+  late final AnimationController _shimmerCtrl;
+  late final AnimationController _flyCtrl;
+  late final Animation<double> _shimmerAnim;
+  late final Animation<double> _flyOffset;
+  late final Animation<double> _flyOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Shimmer sweep across the button — slow, 2 s loop
+    _shimmerCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+    _shimmerAnim = Tween<double>(begin: -1.5, end: 2.5).animate(
+      CurvedAnimation(parent: _shimmerCtrl, curve: Curves.easeInOut),
+    );
+
+    // Icon flying up and fading — 1.2 s loop
+    _flyCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _flyOffset = Tween<double>(begin: 0, end: -18).animate(
+      CurvedAnimation(parent: _flyCtrl, curve: Curves.easeIn),
+    );
+    _flyOpacity = Tween<double>(begin: 1, end: 0).animate(
+      CurvedAnimation(
+        parent: _flyCtrl,
+        curve: const Interval(0.4, 1.0, curve: Curves.easeOut),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _shimmerCtrl.dispose();
+    _flyCtrl.dispose();
+    super.dispose();
+  }
+
+  void _startAnimations() {
+    _shimmerCtrl.repeat();
+    _flyCtrl.repeat();
+  }
+
+  void _stopAnimations() {
+    _shimmerCtrl.stop();
+    _shimmerCtrl.reset();
+    _flyCtrl.stop();
+    _flyCtrl.reset();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
       child: BlocBuilder<PdfExportCubit, PdfExportState>(
         builder: (context, state) {
           final isGenerating = state is Generating;
-          return Container(
-            width: double.infinity,
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: AppDesignSystem.primaryGradient,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
+
+          if (isGenerating) {
+            _startAnimations();
+          } else {
+            _stopAnimations();
+          }
+
+          return Builder(
+            builder: (btnContext) {
+              return GestureDetector(
+                onTap: isGenerating
+                    ? null
+                    : () {
+                        final box =
+                            btnContext.findRenderObject() as RenderBox?;
+                        final offset = box?.localToGlobal(Offset.zero);
+                        final rect = offset != null && box != null
+                            ? offset & box.size
+                            : null;
+                        context.read<PdfExportCubit>().exportToPdf(
+                              widget.document,
+                              sharePositionOrigin: rect,
+                            );
+                      },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                    child: AnimatedBuilder(
+                      animation:
+                          Listenable.merge([_shimmerAnim, _flyOffset]),
+                      builder: (context, _) {
+                        return Container(
+                          height: 58,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                const Color(0xFF4CAF50).withValues(alpha: 0.45),
+                                const Color(0xFF2E7D32).withValues(alpha: 0.28),
+                                const Color(0xFF66BB6A).withValues(alpha: 0.38),
+                              ],
+                            ),
+                            border: Border.all(
+                              color: const Color(0xFF81C784).withValues(alpha: 0.55),
+                              width: 1.2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF4CAF50).withValues(alpha: 0.35),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Stack(
+                            children: [
+                              // Shimmer sweep (only while generating)
+                              if (isGenerating)
+                                Positioned.fill(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Transform.translate(
+                                      offset: Offset(
+                                        _shimmerAnim.value *
+                                            300,
+                                        0,
+                                      ),
+                                      child: Container(
+                                        width: 80,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.white
+                                                  .withValues(alpha: 0),
+                                              const Color(0xFFA5D6A7)
+                                                  .withValues(alpha: 0.45),
+                                              Colors.white
+                                                  .withValues(alpha: 0),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              // Button content
+                              Center(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Icon — flies up and fades when generating
+                                    if (isGenerating)
+                                      Transform.translate(
+                                        offset: Offset(0, _flyOffset.value),
+                                        child: FadeTransition(
+                                          opacity: _flyOpacity,
+                                          child: const Icon(
+                                            Icons.send_rounded,
+                                            color: Colors.white,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      )
+                                    else
+                                      const Icon(
+                                        Icons.share_rounded,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      isGenerating
+                                          ? l10n.generatingPdfLabel
+                                          : l10n.exportPdfButtonLabel,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15,
+                                        letterSpacing: 0.4,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ],
-            ),
-            child: Builder(
-              builder: (btnContext) {
-                return ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: isGenerating
-                      ? null
-                      : () {
-                          final box = btnContext.findRenderObject() as RenderBox?;
-                          final offset = box?.localToGlobal(Offset.zero);
-                          final rect = offset != null && box != null
-                              ? offset & box.size
-                              : null;
-                          
-                          context.read<PdfExportCubit>().exportToPdf(
-                                document,
-                                sharePositionOrigin: rect,
-                              );
-                        },
-                  icon: isGenerating
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : const Icon(Icons.share_rounded, color: Colors.white),
-                  label: Text(
-                    isGenerating ? l10n.generatingPdfLabel : l10n.exportPdfButtonLabel,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                );
-              },
-            ),
+              );
+            },
           );
         },
       ),
     );
   }
 }
+
 
 class _PageThumbnail extends StatelessWidget {
   const _PageThumbnail({

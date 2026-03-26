@@ -186,5 +186,12 @@
   "dashboardStartScan": "Nowy skan",
   "settingsTitle": "Ustawienia",
   "settingsProfile": "Mój profil",
-  "settingsVersion": "Wersja aplikacji"
+  "settingsVersion": "Wersja aplikacji",
+  "settingsBackupSection": "KOPIA ZAPASOWA",
+  "settingsCreateBackup": "Utwórz kopię zapasową",
+  "settingsRestoreBackup": "Przywróć z kopii",
+  "backupSuccessMessage": "Kopia zapasowa została utworzona pomyślnie!",
+  "restoreSuccessMessage": "Dane zostały przywrócone pomyślnie!",
+  "backupFailedMessage": "Błąd podczas tworzenia kopii zapasowej.",
+  "restoreFailedMessage": "Błąd podczas przywracania danych."
 }

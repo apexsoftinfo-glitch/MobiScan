@@ -951,6 +951,48 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Wersja aplikacji'**
   String get settingsVersion;
+
+  /// No description provided for @settingsBackupSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'KOPIA ZAPASOWA'**
+  String get settingsBackupSection;
+
+  /// No description provided for @settingsCreateBackup.
+  ///
+  /// In pl, this message translates to:
+  /// **'Utwórz kopię zapasową'**
+  String get settingsCreateBackup;
+
+  /// No description provided for @settingsRestoreBackup.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przywróć z kopii'**
+  String get settingsRestoreBackup;
+
+  /// No description provided for @backupSuccessMessage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kopia zapasowa została utworzona pomyślnie!'**
+  String get backupSuccessMessage;
+
+  /// No description provided for @restoreSuccessMessage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dane zostały przywrócone pomyślnie!'**
+  String get restoreSuccessMessage;
+
+  /// No description provided for @backupFailedMessage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Błąd podczas tworzenia kopii zapasowej.'**
+  String get backupFailedMessage;
+
+  /// No description provided for @restoreFailedMessage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Błąd podczas przywracania danych.'**
+  String get restoreFailedMessage;
 }
 
 class _AppLocalizationsDelegate

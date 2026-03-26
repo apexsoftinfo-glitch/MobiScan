@@ -69,7 +69,7 @@ extension DocumentListStateX on DocumentListState {
   }
 }
 
-@injectable
+@lazySingleton
 class DocumentListCubit extends Cubit<DocumentListState> {
   DocumentListCubit(this._documentRepository) : super(const DocumentListState.initial());
 

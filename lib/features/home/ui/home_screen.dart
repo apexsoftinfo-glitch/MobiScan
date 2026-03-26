@@ -25,9 +25,6 @@ class HomeScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => getIt<list_cubit.DocumentListCubit>()..loadDocuments(userId),
-        ),
-        BlocProvider(
           create: (context) => getIt<scanner_cubit.DocumentScannerCubit>(),
         ),
       ],

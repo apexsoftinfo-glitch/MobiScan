@@ -14,6 +14,7 @@ abstract class DocumentRepository {
     required int pageIndex,
   });
   Future<void> deletePage(String id);
+  Future<List<DocumentModel>> getDocuments(String userId);
 }
 
 @LazySingleton(as: DocumentRepository)
@@ -76,5 +77,22 @@ class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<void> deletePage(String id) async {
     await _dataSource.deletePage(id);
+  }
+
+  @override
+  Future<List<DocumentModel>> getDocuments(String userId) async {
+    final rawDocs = await _dataSource.getDocuments(userId);
+    final documents = <DocumentModel>[];
+
+    for (final rawDoc in rawDocs) {
+      final docId = rawDoc['id'] as String;
+      final rawPages = await _dataSource.getPages(docId);
+      documents.add(DocumentModel.fromJson({
+        ...rawDoc,
+        'pages': rawPages,
+      }));
+    }
+
+    return documents;
   }
 }

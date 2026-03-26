@@ -483,4 +483,26 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settingsVersion => 'Wersja aplikacji';
+
+  @override
+  String get settingsBackupSection => 'KOPIA ZAPASOWA';
+
+  @override
+  String get settingsCreateBackup => 'Utwórz kopię zapasową';
+
+  @override
+  String get settingsRestoreBackup => 'Przywróć z kopii';
+
+  @override
+  String get backupSuccessMessage =>
+      'Kopia zapasowa została utworzona pomyślnie!';
+
+  @override
+  String get restoreSuccessMessage => 'Dane zostały przywrócone pomyślnie!';
+
+  @override
+  String get backupFailedMessage => 'Błąd podczas tworzenia kopii zapasowej.';
+
+  @override
+  String get restoreFailedMessage => 'Błąd podczas przywracania danych.';
 }

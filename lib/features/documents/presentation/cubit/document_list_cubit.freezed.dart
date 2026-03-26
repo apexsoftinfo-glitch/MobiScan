@@ -12,7 +12,7 @@ part of 'document_list_cubit.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$DocumentListState {
+mixin _$DocumentListState implements DiagnosticableTreeMixin {
 
  String get searchQuery; DocumentSortOrder get sortOrder;
 /// Create a copy of DocumentListState
@@ -22,6 +22,12 @@ mixin _$DocumentListState {
 $DocumentListStateCopyWith<DocumentListState> get copyWith => _$DocumentListStateCopyWithImpl<DocumentListState>(this as DocumentListState, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentListState'))
+    ..add(DiagnosticsProperty('searchQuery', searchQuery))..add(DiagnosticsProperty('sortOrder', sortOrder));
+}
 
 @override
 bool operator ==(Object other) {
@@ -33,7 +39,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,searchQuery,sortOrder);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentListState(searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 
@@ -218,7 +224,7 @@ return error(_that.errorKey,_that.searchQuery,_that.sortOrder);case _:
 /// @nodoc
 
 
-class Initial implements DocumentListState {
+class Initial with DiagnosticableTreeMixin implements DocumentListState {
   const Initial({this.searchQuery = '', this.sortOrder = DocumentSortOrder.dateDesc});
   
 
@@ -232,6 +238,12 @@ class Initial implements DocumentListState {
 $InitialCopyWith<Initial> get copyWith => _$InitialCopyWithImpl<Initial>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentListState.initial'))
+    ..add(DiagnosticsProperty('searchQuery', searchQuery))..add(DiagnosticsProperty('sortOrder', sortOrder));
+}
 
 @override
 bool operator ==(Object other) {
@@ -243,7 +255,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,searchQuery,sortOrder);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentListState.initial(searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 
@@ -286,7 +298,7 @@ as DocumentSortOrder,
 /// @nodoc
 
 
-class Loading implements DocumentListState {
+class Loading with DiagnosticableTreeMixin implements DocumentListState {
   const Loading({required this.searchQuery, required this.sortOrder});
   
 
@@ -300,6 +312,12 @@ class Loading implements DocumentListState {
 $LoadingCopyWith<Loading> get copyWith => _$LoadingCopyWithImpl<Loading>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentListState.loading'))
+    ..add(DiagnosticsProperty('searchQuery', searchQuery))..add(DiagnosticsProperty('sortOrder', sortOrder));
+}
 
 @override
 bool operator ==(Object other) {
@@ -311,7 +329,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,searchQuery,sortOrder);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentListState.loading(searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 
@@ -354,7 +372,7 @@ as DocumentSortOrder,
 /// @nodoc
 
 
-class Success implements DocumentListState {
+class Success with DiagnosticableTreeMixin implements DocumentListState {
   const Success({required final  List<DocumentModel> documents, required this.searchQuery, required this.sortOrder}): _documents = documents;
   
 
@@ -375,6 +393,12 @@ class Success implements DocumentListState {
 $SuccessCopyWith<Success> get copyWith => _$SuccessCopyWithImpl<Success>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentListState.success'))
+    ..add(DiagnosticsProperty('documents', documents))..add(DiagnosticsProperty('searchQuery', searchQuery))..add(DiagnosticsProperty('sortOrder', sortOrder));
+}
 
 @override
 bool operator ==(Object other) {
@@ -386,7 +410,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_documents),searchQuery,sortOrder);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentListState.success(documents: $documents, searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 
@@ -430,7 +454,7 @@ as DocumentSortOrder,
 /// @nodoc
 
 
-class Error implements DocumentListState {
+class Error with DiagnosticableTreeMixin implements DocumentListState {
   const Error({required this.errorKey, required this.searchQuery, required this.sortOrder});
   
 
@@ -445,6 +469,12 @@ class Error implements DocumentListState {
 $ErrorCopyWith<Error> get copyWith => _$ErrorCopyWithImpl<Error>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentListState.error'))
+    ..add(DiagnosticsProperty('errorKey', errorKey))..add(DiagnosticsProperty('searchQuery', searchQuery))..add(DiagnosticsProperty('sortOrder', sortOrder));
+}
 
 @override
 bool operator ==(Object other) {
@@ -456,7 +486,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,errorKey,searchQuery,sortOrder);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentListState.error(errorKey: $errorKey, searchQuery: $searchQuery, sortOrder: $sortOrder)';
 }
 

@@ -26,7 +26,7 @@ void main() {
       act: (cubit) => cubit.renameDocument(id: docId, newName: newName),
       expect: () => [
         const DocumentDetailState.loading(),
-        const DocumentDetailState.success(successKey: 'document_renamed'),
+        const DocumentDetailState.success(successKey: 'document_renamed', newName: 'New Name'),
       ],
     );
 

@@ -148,55 +148,116 @@ class _StatsRow extends StatelessWidget {
 
 // ─── Scan button ──────────────────────────────────────────────────────────
 
-class _ScanButton extends StatelessWidget {
+class _ScanButton extends StatefulWidget {
   const _ScanButton({required this.userId, required this.l10n});
 
   final String userId;
   final AppLocalizations l10n;
 
   @override
+  State<_ScanButton> createState() => _ScanButtonState();
+}
+
+class _ScanButtonState extends State<_ScanButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    _controller.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return BlocBuilder<scanner_cubit.DocumentScannerCubit, scanner_cubit.DocumentScannerState>(
+    return BlocBuilder<scanner_cubit.DocumentScannerCubit,
+        scanner_cubit.DocumentScannerState>(
       builder: (context, state) {
         final isSaving = state is scanner_cubit.Saving;
         final isScanning = state is scanner_cubit.Scanning;
         final isLoading = isSaving || isScanning;
-        return SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.onSurface,
-              foregroundColor: theme.scaffoldBackgroundColor,
-              shape: const RoundedRectangleBorder(),
-              elevation: 0,
-            ),
-            onPressed: isLoading
-                ? null
-                : () => context.read<scanner_cubit.DocumentScannerCubit>().startScan(userId),
-            icon: isLoading
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: theme.scaffoldBackgroundColor,
+
+        return AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            final glowValue = _animation.value;
+            return GestureDetector(
+              onTap: isLoading
+                  ? null
+                  : () => context
+                      .read<scanner_cubit.DocumentScannerCubit>()
+                      .startScan(widget.userId),
+              child: Transform.scale(
+                scale: 1.0 + (glowValue * 0.02),
+                child: Container(
+                  width: double.infinity,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface,
+                    borderRadius: BorderRadius.zero,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4CAF50).withValues(
+                          alpha: 0.2 + (glowValue * 0.3),
+                        ),
+                        blurRadius: 10 + (glowValue * 15),
+                        spreadRadius: 2 + (glowValue * 4),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isLoading)
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: theme.scaffoldBackgroundColor,
+                            ),
+                          )
+                        else
+                          Icon(
+                            Icons.add,
+                            color: theme.scaffoldBackgroundColor,
+                            size: 22,
+                          ),
+                        const SizedBox(width: 8),
+                        Text(
+                          isSaving
+                              ? widget.l10n.savingLabel.toUpperCase()
+                              : widget.l10n.dashboardStartScan.toUpperCase(),
+                          style: TextStyle(
+                            color: theme.scaffoldBackgroundColor,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ],
                     ),
-                  )
-                : Icon(Icons.add, color: theme.scaffoldBackgroundColor, size: 22),
-            label: Text(
-              isSaving
-                  ? l10n.savingLabel.toUpperCase()
-                  : l10n.dashboardStartScan.toUpperCase(),
-              style: TextStyle(
-                color: theme.scaffoldBackgroundColor,
-                fontWeight: FontWeight.w800,
-                fontSize: 14,
-                letterSpacing: 2,
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
