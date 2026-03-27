@@ -35,3 +35,6 @@ opencode.json
 # OS
 .DS_Store
 *.jpg
+
+# Android build reports
+android/build/reports/
