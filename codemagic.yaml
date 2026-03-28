@@ -8,7 +8,6 @@ workflows:
       vars:
         BUNDLE_ID: "com.anatolkaramanyan.mobiscan"
         APP_STORE_APPLE_ID: "6761273110"
-
       groups:
         - google_play
         - app_store_credentials
@@ -33,11 +32,17 @@ workflows:
             LATEST_BUILD_NUMBER=0
           fi
           NEW_BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
-          echo "Latest App Store build number: $LATEST_BUILD_NUMBER"
-          echo "New iOS build number: $NEW_BUILD_NUMBER"
+          echo "LATEST_BUILD_NUMBER=$LATEST_BUILD_NUMBER" | tee -a $CM_BUILD_DIR/build_numbers.env
+          echo "NEW_BUILD_NUMBER=$NEW_BUILD_NUMBER" | tee -a $CM_BUILD_DIR/build_numbers.env
           cd ios
           agvtool new-version -all $NEW_BUILD_NUMBER
+          agvtool what-version
           cd ..
+
+      - name: Load build number
+        script: |
+          source $CM_BUILD_DIR/build_numbers.env
+          echo "Using iOS build number: $NEW_BUILD_NUMBER"
 
       - name: Build Android release AAB
         script: |
@@ -45,7 +50,8 @@ workflows:
 
       - name: Build iOS IPA
         script: |
-          flutter build ipa --release
+          source $CM_BUILD_DIR/build_numbers.env
+          flutter build ipa --release --build-number=$NEW_BUILD_NUMBER
 
     artifacts:
       - build/app/outputs/bundle/release/app-release.aab
@@ -56,6 +62,7 @@ workflows:
       google_play:
         credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
         track: internal
+        submit_as_draft: true
 
       app_store_connect:
         auth: integration
