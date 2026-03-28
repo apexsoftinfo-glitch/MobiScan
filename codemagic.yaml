@@ -1,0 +1,61 @@
+workflows:
+  mobiscan_release:
+    name: MobiScan Release
+    max_build_duration: 120
+
+    environment:
+      flutter: stable
+      vars:
+        BUNDLE_ID: "com.anatolkaramanyan.mobiscan"
+        APP_STORE_APPLE_ID: "6761273110"
+
+      groups:
+        - google_play
+        - app_store_credentials
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+
+    scripts:
+      - name: Flutter pub get
+        script: |
+          flutter pub get
+
+      - name: Set iOS build number automatically
+        script: |
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
+          if [ -z "$LATEST_BUILD_NUMBER" ]; then
+            LATEST_BUILD_NUMBER=0
+          fi
+          NEW_BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
+          echo "Latest App Store build number: $LATEST_BUILD_NUMBER"
+          echo "New iOS build number: $NEW_BUILD_NUMBER"
+          cd ios
+          agvtool new-version -all $NEW_BUILD_NUMBER
+          cd ..
+
+      - name: Build Android release AAB
+        script: |
+          flutter build appbundle --release
+
+      - name: Build iOS IPA
+        script: |
+          flutter build ipa --release
+
+    artifacts:
+      - build/app/outputs/bundle/release/app-release.aab
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      google_play:
+        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+
+      app_store_connect:
+        auth: integration
