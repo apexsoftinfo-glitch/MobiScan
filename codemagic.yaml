@@ -25,6 +25,19 @@ workflows:
         script: |
           flutter pub get
 
+      - name: Generate config/api-keys.json
+        script: |
+          mkdir -p config
+          echo "Generating config/api-keys.json from environment variables..."
+          cat <<EOF > config/api-keys.json
+          {
+            "SUPABASE_URL": "$SUPABASE_URL",
+            "SUPABASE_ANON_KEY": "$SUPABASE_ANON_KEY",
+            "REVENUECAT_APPLE_API_KEY": "$REVENUECAT_APPLE_API_KEY",
+            "REVENUECAT_GOOGLE_API_KEY": "$REVENUECAT_GOOGLE_API_KEY"
+          }
+          EOF
+
       - name: Set iOS build number automatically
         script: |
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
@@ -46,12 +59,12 @@ workflows:
 
       - name: Build Android release AAB
         script: |
-          flutter build appbundle --release
+          flutter build appbundle --release --dart-define-from-file=config/api-keys.json
 
       - name: Build iOS IPA
         script: |
           source $CM_BUILD_DIR/build_numbers.env
-          flutter build ipa --release --build-number=$NEW_BUILD_NUMBER
+          flutter build ipa --release --build-number=$NEW_BUILD_NUMBER --dart-define-from-file=config/api-keys.json
 
     artifacts:
       - build/app/outputs/bundle/release/app-release.aab
