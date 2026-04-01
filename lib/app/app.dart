@@ -7,6 +7,7 @@ import 'navigation/session_navigation_observer.dart';
 import 'router/app_gate.dart';
 import 'session/presentation/cubit/session_cubit.dart';
 import 'theme/theme_cubit.dart';
+import '../core/config/app_config.dart';
 import 'ui/missing_supabase_keys_screen.dart';
 import 'ui/splash_screen.dart';
 import '../features/documents/presentation/cubit/document_list_cubit.dart';
@@ -220,6 +221,13 @@ class _AppShellState extends State<_AppShell> {
         ),
       );
     } else {
+      if (AppConfig.isReleaseMode) {
+        return const Scaffold(
+          body: Center(
+            child: Text('Technical difficulties. Please try again later.'),
+          ),
+        );
+      }
       return const MissingSupabaseKeysScreen();
     }
   }

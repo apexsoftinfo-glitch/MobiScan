@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'api_keys.dart';
 
 abstract final class AppConfig {
+  static bool get isReleaseMode => kReleaseMode;
+
   static bool get hasSupabaseKeys =>
       ApiKeys.supabaseUrl.trim().isNotEmpty &&
       ApiKeys.supabaseAnonKey.trim().isNotEmpty;
