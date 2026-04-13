@@ -23,6 +23,8 @@ class SupabaseSharedUserDataSource implements SharedUserDataSource {
     debugPrint(
       'ℹ️ [SharedUserDataSource] watchSharedUser subscribed userId=$userId',
     );
+    int emptyRetryCount = 0;
+
     return _supabaseClient
         .from('shared_users')
         .stream(primaryKey: ['id'])
@@ -32,17 +34,34 @@ class SupabaseSharedUserDataSource implements SharedUserDataSource {
             'ℹ️ [SharedUserDataSource] watchSharedUser rows userId=$userId count=${rows.length}',
           );
           if (rows.isEmpty) {
+            emptyRetryCount++;
+            if (emptyRetryCount > 3) {
+              debugPrint(
+                '❌ [SharedUserDataSource] watchSharedUser empty too many times, possible RLS issue. Giving up on ensuring row.',
+              );
+              yield null;
+              return;
+            }
+
             debugPrint(
-              '⚠️ [SharedUserDataSource] shared user missing; ensuring shell row userId=$userId',
+              '⚠️ [SharedUserDataSource] shared user missing (attempt $emptyRetryCount); ensuring shell row userId=$userId',
             );
-            final ensuredSharedUser = await ensureSharedUser(userId);
-            debugPrint(
-              '✅ [SharedUserDataSource] ensured shared user userId=$userId firstName=${ensuredSharedUser['first_name'] ?? "-"}',
-            );
-            yield ensuredSharedUser;
+            
+            try {
+              final ensuredSharedUser = await ensureSharedUser(userId);
+              debugPrint(
+                '✅ [SharedUserDataSource] ensured shared user userId=$userId firstName=${ensuredSharedUser['first_name'] ?? "-"}',
+              );
+              yield ensuredSharedUser;
+            } catch (e) {
+              debugPrint('❌ [SharedUserDataSource] failed to ensure shared user: $e');
+              // Propagate error to trigger retry at repository level
+              rethrow;
+            }
             return;
           }
 
+          emptyRetryCount = 0; // Reset on success
           final sharedUser = Map<String, dynamic>.from(rows.first);
           debugPrint(
             'ℹ️ [SharedUserDataSource] shared user received userId=$userId firstName=${sharedUser['first_name'] ?? "-"}',

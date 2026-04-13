@@ -125,10 +125,14 @@ class SessionRepositoryImpl implements SessionRepository {
 
   void _startSessionStream() {
     _sessionSubscription?.cancel();
-    _sessionSubscription = _buildSessionStream().listen(
+    _sessionSubscription = Rx.retryWhen(
+      _buildSessionStream,
+      (error, stackTrace) =>
+          Stream<void>.periodic(const Duration(seconds: 2)).take(1),
+    ).listen(
       _controller.add,
       onError: (Object error, StackTrace stackTrace) {
-        debugPrint('❌ [SessionRepository] stream error: $error');
+        debugPrint('❌ [SessionRepository] terminal stream error: $error');
         _controller.addError(error, stackTrace);
       },
     );

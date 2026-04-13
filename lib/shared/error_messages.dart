@@ -19,7 +19,11 @@ String mapErrorToKey(Object error) {
     return 'password_error';
   }
 
-  if (message.contains('network')) {
+  if (message.contains('network') ||
+      message.contains('timeout') ||
+      message.contains('connection') ||
+      message.contains('socket') ||
+      message.contains('xmlhttprequest')) {
     return 'network_error';
   }
 
