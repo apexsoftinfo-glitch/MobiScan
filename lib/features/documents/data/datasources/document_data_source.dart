@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class DocumentDataSource {
   Stream<List<Map<String, dynamic>>> watchDocuments(String userId);
   Stream<List<Map<String, dynamic>>> watchPages(String documentId);
+  Stream<List<Map<String, dynamic>>> watchAllPages();
   Future<Map<String, dynamic>> createDocument(Map<String, dynamic> document);
   Future<void> updateDocument(String id, Map<String, dynamic> document);
   Future<void> deleteDocument(String id);
@@ -38,6 +40,14 @@ class SupabaseDocumentDataSource implements DocumentDataSource {
   }
 
   @override
+  Stream<List<Map<String, dynamic>>> watchAllPages() {
+    return _supabaseClient
+        .from('mobiscan_pages')
+        .stream(primaryKey: ['id'])
+        .order('page_index', ascending: true);
+  }
+
+  @override
   Future<Map<String, dynamic>> createDocument(Map<String, dynamic> document) async {
     final response = await _supabaseClient
         .from('mobiscan_documents')
@@ -49,7 +59,18 @@ class SupabaseDocumentDataSource implements DocumentDataSource {
 
   @override
   Future<void> updateDocument(String id, Map<String, dynamic> document) async {
-    await _supabaseClient.from('mobiscan_documents').update(document).eq('id', id);
+    debugPrint('ℹ️ [DocumentDataSource] updateDocument id=$id data=$document');
+    final response = await _supabaseClient
+        .from('mobiscan_documents')
+        .update(document)
+        .eq('id', id)
+        .select();
+    
+    if (response.isEmpty) {
+      debugPrint('⚠️ [DocumentDataSource] updateDocument: No rows affected. Check RLS or ID.');
+      throw Exception('no_rows_affected');
+    }
+    debugPrint('✅ [DocumentDataSource] updateDocument succeeded. Result: ${response.first}');
   }
 
   @override

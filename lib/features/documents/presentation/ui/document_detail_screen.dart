@@ -9,6 +9,7 @@ import '../../../../core/di/injection.dart';
 import '../../../../l10n/l10n.dart';
 import '../../models/document_model.dart';
 import '../cubit/document_detail_cubit.dart';
+import '../cubit/document_list_cubit.dart' as list_cubit;
 import '../cubit/pdf_export_cubit.dart';
 
 class DocumentDetailScreen extends StatelessWidget {
@@ -139,7 +140,7 @@ class _DocumentDetailView extends StatelessWidget {
             onPressed: () => _showRenameDialog(context),
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline_rounded),
+            icon: Icon(Icons.delete_outline_rounded, color: Colors.red.shade600),
             onPressed: () => _showDeleteConfirmation(context),
           ),
         ],
@@ -200,11 +201,27 @@ class _DocumentDetailView extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () {
-              context.read<DocumentDetailCubit>().renameDocument(
-                    id: document.id,
-                    newName: controller.text,
-                  );
+              final newName = controller.text.trim();
+              if (newName.isEmpty) return;
+
+              // Close the dialog immediately
               Navigator.pop(dialogContext);
+
+              try {
+                // Perform renaming
+                context.read<DocumentDetailCubit>().renameDocument(
+                      id: document.id,
+                      newName: newName,
+                    );
+                
+                // Update global list optimistically
+                context.read<list_cubit.DocumentListCubit>().renameDocument(
+                      id: document.id,
+                      newName: newName,
+                    );
+              } catch (e) {
+                debugPrint('❌ [DocumentDetailScreen] Rename error: $e');
+              }
             },
             child: Text(l10n.saveFirstNameButtonLabel),
           ),
@@ -531,7 +548,15 @@ class _PageThumbnail extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   file.existsSync()
-                      ? Image.file(file, fit: BoxFit.cover)
+                      ? ColorFiltered(
+                          colorFilter: const ColorFilter.matrix([
+                            1.2, 0, 0, 0, -25.6,
+                            0, 1.2, 0, 0, -25.6,
+                            0, 0, 1.2, 0, -25.6,
+                            0, 0, 0, 1, 0,
+                          ]),
+                          child: Image.file(file, fit: BoxFit.cover),
+                        )
                       : Container(
                           color: theme.cardTheme.color,
                           child: Icon(Icons.broken_image_outlined,
@@ -615,9 +640,17 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
                       minScale: 0.5,
                       maxScale: 4.0,
                       child: Center(
-                        child: Image.file(
-                          File(snapshot.data!),
-                          fit: BoxFit.contain,
+                        child: ColorFiltered(
+                          colorFilter: const ColorFilter.matrix([
+                            1.2, 0, 0, 0, -25.6,
+                            0, 1.2, 0, 0, -25.6,
+                            0, 0, 1.2, 0, -25.6,
+                            0, 0, 0, 1, 0,
+                          ]),
+                          child: Image.file(
+                            File(snapshot.data!),
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),

@@ -127,6 +127,11 @@ class DocumentListCubit extends Cubit<DocumentListState> {
   Future<void> retry(String userId) async {
     loadDocuments(userId);
   }
+  
+  Future<void> renameDocument({required String id, required String newName}) async {
+    // Rely on repository-level optimistic update
+    await _documentRepository.updateDocumentName(id: id, name: newName);
+  }
 
   Future<void> deleteDocument(String id) async {
     final currentState = state;

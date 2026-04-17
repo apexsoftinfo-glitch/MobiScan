@@ -67,18 +67,28 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
         name: 'Scan $timestamp',
       );
 
-      // Add pages
+      // Add pages and process images
       for (var i = 0; i < images.length; i++) {
-        final sourceFile = File(images[i]);
-        final extension = p.extension(images[i]);
+        final sourcePath = images[i];
+        final extension = p.extension(sourcePath);
         final fileName = '${uuid.v4()}$extension';
         final targetPath = p.join(appDocDir.path, fileName);
         
-        await sourceFile.copy(targetPath);
+        try {
+          // Temporarily revert to direct copy to fix the "gray square" issue
+          // while we investigate the best way to process images safely.
+          await File(sourcePath).copy(targetPath);
+        } catch (e) {
+          debugPrint('❌ [DocumentScannerCubit] copy error: $e');
+          // Try to copy anyway or handle error
+          if (await File(sourcePath).exists()) {
+            await File(sourcePath).copy(targetPath);
+          }
+        }
 
         await _documentRepository.addPage(
           documentId: doc.id,
-          storagePath: fileName, // Store only filename
+          storagePath: fileName,
           pageIndex: i,
         );
       }

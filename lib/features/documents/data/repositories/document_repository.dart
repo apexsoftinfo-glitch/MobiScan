@@ -22,24 +22,38 @@ class DocumentRepositoryImpl implements DocumentRepository {
   DocumentRepositoryImpl(this._dataSource);
 
   final DocumentDataSource _dataSource;
+  final BehaviorSubject<List<DocumentModel>> _documentsSubject = BehaviorSubject();
+  List<DocumentModel> _lastDocuments = [];
 
   @override
   Stream<List<DocumentModel>> watchDocuments(String userId) {
-    return _dataSource.watchDocuments(userId).switchMap((docs) {
-      if (docs.isEmpty) return Stream.value([]);
-
-      final docStreams = docs.map((doc) {
-        final docId = doc['id'] as String;
-        return _dataSource.watchPages(docId).map((pages) {
+    // Optimized stream join: One stream for all documents, one for all pages.
+    final rawStream = CombineLatestStream.combine2<List<Map<String, dynamic>>,
+        List<Map<String, dynamic>>, List<DocumentModel>>(
+      _dataSource.watchDocuments(userId),
+      _dataSource.watchAllPages(),
+      (docs, allPages) {
+        return docs.map((doc) {
+          final docId = doc['id'] as String;
+          final pages = allPages
+              .where((p) => p['document_id'] == docId)
+              .toList();
+          
           return DocumentModel.fromJson({
             ...doc,
             'pages': pages,
           });
-        });
-      }).toList();
+        }).toList();
+      },
+    );
 
-      return CombineLatestStream.list<DocumentModel>(docStreams);
+    // Pipe results to our subject for repository-wide state
+    rawStream.listen((docs) {
+      _lastDocuments = docs;
+      _documentsSubject.add(docs);
     });
+
+    return _documentsSubject.stream;
   }
 
   @override
@@ -53,7 +67,16 @@ class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<void> updateDocumentName({required String id, required String name}) async {
-    await _dataSource.updateDocument(id, {'name': name});
+    final trimmedName = name.trim();
+    // 1. Optimistic update at repository level: change local cache and emit immediately
+    _lastDocuments = _lastDocuments.map((doc) {
+      if (doc.id == id) return doc.copyWith(name: trimmedName);
+      return doc;
+    }).toList();
+    _documentsSubject.add(_lastDocuments);
+
+    // 2. Perform the actual update on the server
+    await _dataSource.updateDocument(id, {'name': trimmedName});
   }
 
   @override

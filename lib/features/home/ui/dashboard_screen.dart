@@ -4,8 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/design/app_design_system.dart';
 import '../../../l10n/l10n.dart';
 import '../../../app/navigation/app_navigator.dart';
+import 'dart:ui';
 import '../../documents/presentation/cubit/document_list_cubit.dart' as list_cubit;
 import '../../documents/presentation/cubit/document_scanner_cubit.dart' as scanner_cubit;
+import '../../documents/presentation/ui/widgets/document_thumbnail.dart';
+import '../../documents/models/document_model.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key, required this.userId});
@@ -184,7 +187,6 @@ class _ScanButtonState extends State<_ScanButton>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return BlocBuilder<scanner_cubit.DocumentScannerCubit,
         scanner_cubit.DocumentScannerState>(
       builder: (context, state) {
@@ -206,52 +208,73 @@ class _ScanButtonState extends State<_ScanButton>
                 scale: 1.0 + (glowValue * 0.02),
                 child: Container(
                   width: double.infinity,
-                  height: 56,
+                  height: 72,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface,
-                    borderRadius: BorderRadius.zero,
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF4CAF50).withValues(
+                        color: const Color(0xFF6366F1).withValues(
                           alpha: 0.2 + (glowValue * 0.3),
                         ),
-                        blurRadius: 10 + (glowValue * 15),
+                        blurRadius: 15 + (glowValue * 15),
                         spreadRadius: 2 + (glowValue * 4),
                       ),
                     ],
                   ),
-                  child: Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isLoading)
-                          SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: theme.scaffoldBackgroundColor,
-                            ),
-                          )
-                        else
-                          Icon(
-                            Icons.add,
-                            color: theme.scaffoldBackgroundColor,
-                            size: 22,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              const Color(0xFF6366F1).withValues(alpha: 0.85),
+                              const Color(0xFF4338CA).withValues(alpha: 0.7),
+                            ],
                           ),
-                        const SizedBox(width: 8),
-                        Text(
-                          isSaving
-                              ? widget.l10n.savingLabel.toUpperCase()
-                              : widget.l10n.dashboardStartScan.toUpperCase(),
-                          style: TextStyle(
-                            color: theme.scaffoldBackgroundColor,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                            letterSpacing: 2,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            width: 1.5,
                           ),
                         ),
-                      ],
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (isLoading)
+                                SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              else
+                                Icon(
+                                  Icons.document_scanner_outlined,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                              const SizedBox(width: 12),
+                              Text(
+                                isSaving
+                                    ? widget.l10n.savingLabel.toUpperCase()
+                                    : widget.l10n.dashboardStartScan.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -309,7 +332,7 @@ class _RecentScansSection extends StatelessWidget {
 class _RecentScanRow extends StatelessWidget {
   const _RecentScanRow({required this.doc});
 
-  final dynamic doc;
+  final DocumentModel doc;
 
   @override
   Widget build(BuildContext context) {
@@ -328,12 +351,14 @@ class _RecentScanRow extends StatelessWidget {
         ),
         child: Row(
           children: [
+            DocumentThumbnail(document: doc, size: 48),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    doc.name as String,
+                    doc.name,
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
@@ -344,10 +369,7 @@ class _RecentScanRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    (doc.createdAt as DateTime)
-                        .toLocal()
-                        .toString()
-                        .substring(0, 10),
+                    '${doc.pages.length} str  ·  ${doc.createdAt.toLocal().toString().substring(0, 10)}',
                     style: TextStyle(
                       fontSize: 11,
                       letterSpacing: 0.5,
@@ -358,9 +380,9 @@ class _RecentScanRow extends StatelessWidget {
               ),
             ),
             Icon(
-              Icons.arrow_forward,
-              size: 18,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
             ),
           ],
         ),

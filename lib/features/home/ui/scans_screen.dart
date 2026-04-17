@@ -1,14 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 import '../../../app/navigation/app_navigator.dart';
 import '../../../l10n/l10n.dart';
-import '../../documents/presentation/cubit/document_list_cubit.dart';
+import '../../documents/presentation/cubit/document_list_cubit.dart' as list_cubit;
 import '../../documents/models/document_model.dart';
+import '../../documents/presentation/ui/widgets/document_thumbnail.dart';
+import '../../documents/presentation/cubit/pdf_export_cubit.dart' as export_cubit;
+import '../../../core/di/injection.dart';
 
 class ScansScreen extends StatefulWidget {
   const ScansScreen({super.key, required this.userId});
@@ -60,7 +59,7 @@ class _ScansScreenState extends State<ScansScreen> {
             child: TextField(
               controller: _searchController,
               onChanged: (value) =>
-                  context.read<DocumentListCubit>().updateSearch(value),
+                  context.read<list_cubit.DocumentListCubit>().updateSearch(value),
               style: TextStyle(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
                 hintText: l10n.searchScansPlaceholder,
@@ -78,7 +77,7 @@ class _ScansScreenState extends State<ScansScreen> {
                         icon: const Icon(Icons.clear, size: 18),
                         onPressed: () {
                           _searchController.clear();
-                          context.read<DocumentListCubit>().updateSearch('');
+                          context.read<list_cubit.DocumentListCubit>().updateSearch('');
                         },
                       )
                     : null,
@@ -104,23 +103,26 @@ class _ScansScreenState extends State<ScansScreen> {
           ),
           const SizedBox(height: 12),
           Expanded(
-            child: BlocBuilder<DocumentListCubit, DocumentListState>(
-              builder: (context, state) {
-                return switch (state) {
-                  Success() => state.filteredDocuments.isEmpty
-                      ? _EmptyScansView(
-                          l10n: l10n,
-                          isSearch: state.searchQuery.isNotEmpty,
-                        )
-                      : _ScansList(documents: state.filteredDocuments),
-                  Error() => _ErrorView(
-                      l10n: l10n,
-                      onRetry: () =>
-                          context.read<DocumentListCubit>().retry(widget.userId),
-                    ),
-                  _ => const Center(child: CircularProgressIndicator()),
-                };
-              },
+            child: BlocProvider(
+              create: (context) => getIt<export_cubit.PdfExportCubit>(),
+              child: BlocBuilder<list_cubit.DocumentListCubit, list_cubit.DocumentListState>(
+                builder: (context, state) {
+                  return switch (state) {
+                    list_cubit.Success() => state.filteredDocuments.isEmpty
+                        ? _EmptyScansView(
+                            l10n: l10n,
+                            isSearch: state.searchQuery.isNotEmpty,
+                          )
+                        : _ScansList(documents: state.filteredDocuments),
+                    list_cubit.Error() => _ErrorView(
+                        l10n: l10n,
+                        onRetry: () =>
+                            context.read<list_cubit.DocumentListCubit>().retry(widget.userId),
+                      ),
+                    _ => const Center(child: CircularProgressIndicator()),
+                  };
+                },
+              ),
             ),
           ),
         ],
@@ -133,32 +135,32 @@ class _SortMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return BlocBuilder<DocumentListCubit, DocumentListState>(
+    return BlocBuilder<list_cubit.DocumentListCubit, list_cubit.DocumentListState>(
       builder: (context, state) {
         final currentOrder = state.sortOrder;
-        return PopupMenuButton<DocumentSortOrder>(
+        return PopupMenuButton<list_cubit.DocumentSortOrder>(
           icon: Icon(Icons.sort, color: theme.colorScheme.onSurface),
           onSelected: (order) =>
-              context.read<DocumentListCubit>().updateSort(order),
+              context.read<list_cubit.DocumentListCubit>().updateSort(order),
           itemBuilder: (context) => [
             CheckedPopupMenuItem(
-              value: DocumentSortOrder.dateDesc,
-              checked: currentOrder == DocumentSortOrder.dateDesc,
+              value: list_cubit.DocumentSortOrder.dateDesc,
+              checked: currentOrder == list_cubit.DocumentSortOrder.dateDesc,
               child: const Text('Najnowsze'),
             ),
             CheckedPopupMenuItem(
-              value: DocumentSortOrder.dateAsc,
-              checked: currentOrder == DocumentSortOrder.dateAsc,
+              value: list_cubit.DocumentSortOrder.dateAsc,
+              checked: currentOrder == list_cubit.DocumentSortOrder.dateAsc,
               child: const Text('Najstarsze'),
             ),
             CheckedPopupMenuItem(
-              value: DocumentSortOrder.nameAsc,
-              checked: currentOrder == DocumentSortOrder.nameAsc,
+              value: list_cubit.DocumentSortOrder.nameAsc,
+              checked: currentOrder == list_cubit.DocumentSortOrder.nameAsc,
               child: const Text('Nazwa A-Z'),
             ),
             CheckedPopupMenuItem(
-              value: DocumentSortOrder.nameDesc,
-              checked: currentOrder == DocumentSortOrder.nameDesc,
+              value: list_cubit.DocumentSortOrder.nameDesc,
+              checked: currentOrder == list_cubit.DocumentSortOrder.nameDesc,
               child: const Text('Nazwa Z-A'),
             ),
           ],
@@ -274,7 +276,7 @@ class _ScanRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             child: Row(
               children: [
-                _DocumentThumbnail(document: document),
+                DocumentThumbnail(document: document, size: 44),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
@@ -303,17 +305,27 @@ class _ScanRow extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(
-                    Icons.delete_outline,
-                    color: theme.colorScheme.error.withValues(alpha: 0.6),
+                  icon: const Icon(
+                    Icons.ios_share,
+                    color: Color(0xFF6366F1), // Vibrant Indigo
                     size: 20,
                   ),
-                  onPressed: () => _showDeleteConfirmation(context),
+                  onPressed: () {
+                    final box = context.findRenderObject() as RenderBox?;
+                    final offset = box?.localToGlobal(Offset.zero);
+                    final rect = offset != null && box != null
+                        ? offset & box.size
+                        : null;
+                    context.read<export_cubit.PdfExportCubit>().exportToPdf(
+                          document,
+                          sharePositionOrigin: rect,
+                        );
+                  },
                 ),
                 Icon(
-                  Icons.arrow_forward,
-                  size: 16,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                  Icons.arrow_forward_ios,
+                  size: 14,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                 ),
               ],
             ),
@@ -321,141 +333,6 @@ class _ScanRow extends StatelessWidget {
         ),
         Divider(height: 1, color: theme.dividerColor, indent: 20, endIndent: 20),
       ],
-    );
-  }
-
-  void _showDeleteConfirmation(BuildContext context) {
-    final l10n = context.l10n;
-    showDialog(
-      context: context,
-      builder: (diagContext) => AlertDialog(
-        shape: const RoundedRectangleBorder(),
-        title: Text(l10n.deleteDocumentDialogTitle,
-            style: const TextStyle(fontWeight: FontWeight.w700)),
-        content: Text(l10n.deleteDocumentDialogBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(diagContext),
-            child: Text(l10n.cancelButtonLabel),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<DocumentListCubit>().deleteDocument(document.id);
-              Navigator.pop(diagContext);
-            },
-            child: Text(
-              'Usuń',
-              style: TextStyle(
-                  color: Colors.red.shade600, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DocumentThumbnail extends StatelessWidget {
-  const _DocumentThumbnail({required this.document});
-
-  final DocumentModel document;
-
-  Future<String?> _resolveFirstPagePath() async {
-    if (document.pages.isEmpty) return null;
-    final path = document.pages.first.storagePath;
-    if (path.contains('/') || path.contains('\\')) return path;
-    final appDocDir = await getApplicationDocumentsDirectory();
-    return p.join(appDocDir.path, path);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final pageCount = document.pages.length;
-    const size = 44.0;
-
-    return FutureBuilder<String?>(
-      future: _resolveFirstPagePath(),
-      builder: (context, snapshot) {
-        final resolvedPath = snapshot.data;
-        final file = resolvedPath != null ? File(resolvedPath) : null;
-        final imageExists = file != null && file.existsSync();
-
-        return SizedBox(
-          width: size + (pageCount > 1 ? 4 : 0),
-          height: size + (pageCount > 1 ? 4 : 0),
-          child: Stack(
-            alignment: Alignment.bottomLeft,
-            children: [
-              // Background card (multi-page indicator)
-              if (pageCount > 1)
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: Container(
-                    width: size,
-                    height: size,
-                    decoration: BoxDecoration(
-                      color: theme.dividerColor,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                      ),
-                    ),
-                  ),
-                ),
-              // Main thumbnail
-              Positioned(
-                bottom: 0,
-                left: 0,
-                child: Container(
-                  width: size,
-                  height: size,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    color: theme.cardTheme.color ?? theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
-                    ),
-                  ),
-                  child: imageExists
-                      ? Image.file(file, fit: BoxFit.cover)
-                      : Icon(
-                          Icons.article_outlined,
-                          size: 22,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                        ),
-                ),
-              ),
-              // Page count badge
-              if (pageCount > 1)
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(4),
-                        bottomRight: Radius.circular(4),
-                      ),
-                    ),
-                    child: Text(
-                      '$pageCount',
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w800,
-                        color: theme.scaffoldBackgroundColor,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

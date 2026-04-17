@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
@@ -25,13 +26,21 @@ class DocumentDetailCubit extends Cubit<DocumentDetailState> {
   final DocumentRepository _documentRepository;
 
   Future<void> renameDocument({required String id, required String newName}) async {
-    if (newName.trim().isEmpty) return;
+    final trimmedName = newName.trim();
+    if (trimmedName.isEmpty) return;
     
-    emit(const DocumentDetailState.loading());
+    // Optimistically update the UI with the new name
+    emit(DocumentDetailState.success(newName: trimmedName));
+    
     try {
-      await _documentRepository.updateDocumentName(id: id, name: newName.trim());
-      emit(DocumentDetailState.success(successKey: 'document_renamed', newName: newName.trim()));
+      await _documentRepository.updateDocumentName(id: id, name: trimmedName);
+      // Emit success again to trigger any listeners for successKey
+      emit(DocumentDetailState.success(
+        successKey: 'document_renamed', 
+        newName: trimmedName,
+      ));
     } catch (e) {
+      debugPrint('DocumentDetailCubit rename error: $e');
       emit(const DocumentDetailState.error(errorKey: 'unknown_error'));
     }
   }

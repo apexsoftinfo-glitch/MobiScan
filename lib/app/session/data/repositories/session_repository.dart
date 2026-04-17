@@ -127,8 +127,13 @@ class SessionRepositoryImpl implements SessionRepository {
     _sessionSubscription?.cancel();
     _sessionSubscription = Rx.retryWhen(
       _buildSessionStream,
-      (error, stackTrace) =>
-          Stream<void>.periodic(const Duration(seconds: 2)).take(1),
+      (error, stackTrace) {
+        debugPrint('⚠️ [SessionRepository] stream error, retrying: $error');
+        // Wait 3 seconds before each retry.
+        // Retry up to 20 times (approx. 1 minute) before giving up and showing error screen.
+        // This handles transient network issues during startup or after long sleep.
+        return Stream<void>.periodic(const Duration(seconds: 3)).take(20);
+      },
     ).listen(
       _controller.add,
       onError: (Object error, StackTrace stackTrace) {
