@@ -5,6 +5,9 @@ workflows:
 
     environment:
       flutter: stable
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.anatolkaramanyan.mobiscan
       vars:
         BUNDLE_ID: "com.anatolkaramanyan.mobiscan"
         APP_STORE_APPLE_ID: "6761273110"
@@ -38,33 +41,50 @@ workflows:
           }
           EOF
 
-      - name: Set iOS build number automatically
+      - name: Set build numbers automatically
         script: |
-          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
-          if [ -z "$LATEST_BUILD_NUMBER" ]; then
+          # Try to get latest build number from App Store, fallback to 0
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID" || echo "0")
+          
+          # Ensure it's a number
+          if ! [[ "$LATEST_BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
             LATEST_BUILD_NUMBER=0
           fi
+          
           NEW_BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
-          echo "LATEST_BUILD_NUMBER=$LATEST_BUILD_NUMBER" | tee -a $CM_BUILD_DIR/build_numbers.env
-          echo "NEW_BUILD_NUMBER=$NEW_BUILD_NUMBER" | tee -a $CM_BUILD_DIR/build_numbers.env
+          
+          # Compare with pubspec version to avoid downgrading
+          PUBSPEC_VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+          PUBSPEC_BUILD=$(echo $PUBSPEC_VERSION | cut -d'+' -f2)
+          
+          if [ "$PUBSPEC_BUILD" -gt "$NEW_BUILD_NUMBER" ]; then
+            NEW_BUILD_NUMBER=$PUBSPEC_BUILD
+          fi
+          
+          echo "LATEST_APP_STORE_BUILD=$LATEST_BUILD_NUMBER"
+          echo "PUBSPEC_BUILD=$PUBSPEC_BUILD"
+          echo "FINAL_BUILD_NUMBER=$NEW_BUILD_NUMBER"
+          
+          echo "NEW_BUILD_NUMBER=$NEW_BUILD_NUMBER" > $CM_BUILD_DIR/build_numbers.env
+          
+          # Update iOS versioning
           cd ios
           agvtool new-version -all $NEW_BUILD_NUMBER
-          agvtool what-version
           cd ..
-
-      - name: Load build number
-        script: |
-          source $CM_BUILD_DIR/build_numbers.env
-          echo "Using iOS build number: $NEW_BUILD_NUMBER"
 
       - name: Build Android release AAB
         script: |
-          flutter build appbundle --release --dart-define-from-file=config/api-keys.json
+          source $CM_BUILD_DIR/build_numbers.env
+          flutter build appbundle --release \
+            --build-number=$NEW_BUILD_NUMBER \
+            --dart-define-from-file=config/api-keys.json
 
       - name: Build iOS IPA
         script: |
           source $CM_BUILD_DIR/build_numbers.env
-          flutter build ipa --release --build-number=$NEW_BUILD_NUMBER --dart-define-from-file=config/api-keys.json
+          flutter build ipa --release \
+            --build-number=$NEW_BUILD_NUMBER \
+            --dart-define-from-file=config/api-keys.json
 
     artifacts:
       - build/app/outputs/bundle/release/app-release.aab
