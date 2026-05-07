@@ -43,6 +43,11 @@ workflows:
 
       - name: Set build numbers automatically
         script: |
+          # Get version from pubspec.yaml
+          PUBSPEC_VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
+          VERSION_NAME=$(echo $PUBSPEC_VERSION | cut -d'+' -f1)
+          VERSION_BUILD=$(echo $PUBSPEC_VERSION | cut -d'+' -f2)
+          
           # Try to get latest build number from App Store, fallback to 0
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID" || echo "0")
           
@@ -54,21 +59,19 @@ workflows:
           NEW_BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
           
           # Compare with pubspec version to avoid downgrading
-          PUBSPEC_VERSION=$(grep 'version: ' pubspec.yaml | sed 's/version: //')
-          PUBSPEC_BUILD=$(echo $PUBSPEC_VERSION | cut -d'+' -f2)
-          
-          if [ "$PUBSPEC_BUILD" -gt "$NEW_BUILD_NUMBER" ]; then
-            NEW_BUILD_NUMBER=$PUBSPEC_BUILD
+          if [ "$VERSION_BUILD" -gt "$NEW_BUILD_NUMBER" ]; then
+            NEW_BUILD_NUMBER=$VERSION_BUILD
           fi
           
-          echo "LATEST_APP_STORE_BUILD=$LATEST_BUILD_NUMBER"
-          echo "PUBSPEC_BUILD=$PUBSPEC_BUILD"
+          echo "VERSION_NAME=$VERSION_NAME"
           echo "FINAL_BUILD_NUMBER=$NEW_BUILD_NUMBER"
           
-          echo "NEW_BUILD_NUMBER=$NEW_BUILD_NUMBER" > $CM_BUILD_DIR/build_numbers.env
+          echo "VERSION_NAME=$VERSION_NAME" > $CM_BUILD_DIR/build_numbers.env
+          echo "NEW_BUILD_NUMBER=$NEW_BUILD_NUMBER" >> $CM_BUILD_DIR/build_numbers.env
           
           # Update iOS versioning
           cd ios
+          agvtool new-marketing-version "$VERSION_NAME"
           agvtool new-version -all $NEW_BUILD_NUMBER
           cd ..
 
@@ -76,6 +79,7 @@ workflows:
         script: |
           source $CM_BUILD_DIR/build_numbers.env
           flutter build appbundle --release \
+            --build-name="$VERSION_NAME" \
             --build-number=$NEW_BUILD_NUMBER \
             --dart-define-from-file=config/api-keys.json
 
@@ -83,6 +87,7 @@ workflows:
         script: |
           source $CM_BUILD_DIR/build_numbers.env
           flutter build ipa --release \
+            --build-name="$VERSION_NAME" \
             --build-number=$NEW_BUILD_NUMBER \
             --dart-define-from-file=config/api-keys.json
 
