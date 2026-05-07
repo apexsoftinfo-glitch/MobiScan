@@ -125,6 +125,10 @@ class _ProfileViewState extends State<_ProfileView> {
               _showTopSuccess(context, l10n.proEnabledSnackbar);
               context.read<AccountActionsCubit>().clearFeedback();
             }
+            if (state.successKey == 'password_updated') {
+              _showTopSuccess(context, l10n.passwordUpdatedSnackbar);
+              context.read<AccountActionsCubit>().clearFeedback();
+            }
             if (state.successKey == 'account_deleted') {
               _showTopSuccess(context, l10n.accountDeletedSnackbar);
               context.read<AccountActionsCubit>().clearFeedback();
@@ -212,7 +216,17 @@ class _ProfileViewState extends State<_ProfileView> {
                                 onTap: () => AppNavigator.goToLogin(context),
                               ),
                             ],
-                            if (!session.isAnonymousUser)
+                            if (!session.isAnonymousUser) ...[
+                              _ProfileActionTile(
+                                enabled: !isSavingName && activeAction == null,
+                                icon: Icons.lock_outline,
+                                title: l10n.changePasswordButtonLabel,
+                                trailing: activeAction ==
+                                        AccountAction.updatePassword
+                                    ? const _Spinner()
+                                    : null,
+                                onTap: () => _showChangePasswordDialog(context),
+                              ),
                               _ProfileActionTile(
                                 enabled: !isSavingName && activeAction == null,
                                 icon: Icons.logout,
@@ -224,25 +238,7 @@ class _ProfileViewState extends State<_ProfileView> {
                                     .read<AccountActionsCubit>()
                                     .signOut(),
                               ),
-                            const SizedBox(height: 8),
-                            _sectionLabel(context, 'SUBSKRYPCJA'),
-                            _SubscriptionRow(session: session),
-                            if (!session.isProUser)
-                              _ProfileActionTile(
-                                enabled: !isSavingName &&
-                                    activeAction == null &&
-                                    session.userIdOrNull != null,
-                                icon: Icons.stars_outlined,
-                                title: l10n.buyProButtonLabel,
-                                isPrimary: true,
-                                trailing:
-                                    activeAction == AccountAction.buyPro
-                                        ? const _Spinner()
-                                        : null,
-                                onTap: () => context
-                                    .read<AccountActionsCubit>()
-                                    .buyPro(session.userIdOrNull!),
-                              ),
+                            ],
                             const SizedBox(height: 8),
                             _sectionLabel(context, 'POZOSTAŁE'),
                             _ProfileActionTile(
@@ -374,6 +370,57 @@ class _ProfileViewState extends State<_ProfileView> {
           userId: userId,
           firstName: _firstNameController.text,
         );
+  }
+
+  Future<void> _showChangePasswordDialog(BuildContext context) async {
+    final l10n = context.l10n;
+    final controller = TextEditingController();
+    final cubit = context.read<AccountActionsCubit>();
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: const RoundedRectangleBorder(),
+        title: Text(l10n.changePasswordDialogTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.changePasswordDialogBody,
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              obscureText: true,
+              autofocus: true,
+              decoration: InputDecoration(
+                labelText: l10n.newPasswordFieldLabel,
+                border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.changePasswordButtonLabel),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && controller.text.trim().length >= 6) {
+      cubit.updatePassword(controller.text.trim());
+    } else if (confirmed == true) {
+      // Show error or just don't close if validation fails
+      // For now we just don't call update if < 6
+    }
   }
 }
 
@@ -537,70 +584,6 @@ class _NameField extends StatelessWidget {
                 ),
               ),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Subscription row ──────────────────────────────────────────────────────
-
-class _SubscriptionRow extends StatelessWidget {
-  const _SubscriptionRow({required this.session});
-
-  final SessionState session;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isPro = session.isProUser;
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: isPro
-          ? BoxDecoration(
-              color: theme.colorScheme.onSurface,
-              border: Border.all(color: theme.colorScheme.onSurface, width: 1.5),
-            )
-          : BoxDecoration(
-              color: theme.cardTheme.color,
-              border: Border.all(color: theme.dividerColor, width: 1.5),
-            ),
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        children: [
-          Icon(
-            isPro ? Icons.workspace_premium : Icons.stars_outlined,
-            size: 36,
-            color: isPro ? theme.scaffoldBackgroundColor : theme.colorScheme.onSurface,
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                isPro ? 'MobiScan PRO' : 'MobiScan FREE',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  color: isPro
-                      ? theme.scaffoldBackgroundColor
-                      : theme.colorScheme.onSurface,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              Text(
-                isPro
-                    ? 'Wszystkie funkcje odblokowane'
-                    : 'Odblokuj pełną moc skanowania',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isPro
-                      ? theme.scaffoldBackgroundColor.withValues(alpha: 0.65)
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.45),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );

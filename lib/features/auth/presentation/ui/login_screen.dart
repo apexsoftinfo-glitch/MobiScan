@@ -65,7 +65,18 @@ class _LoginViewState extends State<_LoginView> {
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
-                child: BlocBuilder<LoginCubit, LoginState>(
+                child: BlocConsumer<LoginCubit, LoginState>(
+                  listener: (context, state) {
+                    if (state.isResetSent) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.passwordResetSentSnackbar),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      context.read<LoginCubit>().clearResetStatus();
+                    }
+                  },
                   builder: (context, state) {
                     final isLoading = state.isLoading;
 
@@ -115,16 +126,26 @@ class _LoginViewState extends State<_LoginView> {
                           textInputAction: TextInputAction.done,
                           onSubmitted: (_) => _submit(context),
                         ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: isLoading ? null : () => _onForgotPassword(context),
+                            child: Text(l10n.forgotPasswordButtonLabel),
+                          ),
+                        ),
                         if (state.errorKey != null) ...[
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 8),
                           SelectableText(
-                            messageForErrorKey(l10n, state.errorKey),
+                            state.errorKey == 'email_empty'
+                                ? l10n.emailEmptyError
+                                : messageForErrorKey(l10n, state.errorKey),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.error,
                             ),
                           ),
                         ],
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         FilledButton(
                           onPressed: isLoading ? null : () => _submit(context),
                           child: isLoading
@@ -147,6 +168,12 @@ class _LoginViewState extends State<_LoginView> {
         ),
       ),
     );
+  }
+
+  void _onForgotPassword(BuildContext context) {
+    final cubit = context.read<LoginCubit>();
+    final email = _emailController.text;
+    cubit.sendPasswordReset(email);
   }
 
   void _submit(BuildContext context) {

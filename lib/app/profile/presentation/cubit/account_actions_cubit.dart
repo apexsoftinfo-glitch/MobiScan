@@ -14,6 +14,7 @@ enum AccountAction {
   deleteAccount,
   buyPro,
   developerProOverride,
+  updatePassword,
 }
 
 @freezed
@@ -123,6 +124,26 @@ class AccountActionsCubit extends Cubit<AccountActionsState> {
       debugPrint(
         '❌ [AccountActionsCubit] setDeveloperProOverride error: $error',
       );
+      emit(state.copyWith(activeAction: null, errorKey: mapErrorToKey(error)));
+    }
+  }
+
+  Future<void> updatePassword(String newPassword) async {
+    if (state.activeAction != null) return;
+
+    emit(
+      state.copyWith(
+        activeAction: AccountAction.updatePassword,
+        errorKey: null,
+        successKey: null,
+      ),
+    );
+
+    try {
+      await _authRepository.updatePassword(newPassword);
+      emit(state.copyWith(activeAction: null, successKey: 'password_updated'));
+    } catch (error) {
+      debugPrint('❌ [AccountActionsCubit] updatePassword error: $error');
       emit(state.copyWith(activeAction: null, errorKey: mapErrorToKey(error)));
     }
   }

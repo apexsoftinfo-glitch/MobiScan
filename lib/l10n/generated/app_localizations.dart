@@ -400,6 +400,12 @@ abstract class AppLocalizations {
   /// **'Pro aktywowane'**
   String get proEnabledSnackbar;
 
+  /// No description provided for @passwordUpdatedSnackbar.
+  ///
+  /// In pl, this message translates to:
+  /// **'Hasło zostało zmienione'**
+  String get passwordUpdatedSnackbar;
+
   /// No description provided for @profileTitle.
   ///
   /// In pl, this message translates to:
@@ -417,6 +423,66 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Zapisz imię'**
   String get saveFirstNameButtonLabel;
+
+  /// No description provided for @changePasswordButtonLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmień hasło'**
+  String get changePasswordButtonLabel;
+
+  /// No description provided for @newPasswordFieldLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nowe hasło'**
+  String get newPasswordFieldLabel;
+
+  /// No description provided for @changePasswordDialogTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmień hasło'**
+  String get changePasswordDialogTitle;
+
+  /// No description provided for @changePasswordDialogBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wprowadź nowe hasło dla swojego konta.'**
+  String get changePasswordDialogBody;
+
+  /// No description provided for @forgotPasswordButtonLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapomniałeś hasła?'**
+  String get forgotPasswordButtonLabel;
+
+  /// No description provided for @passwordResetSentSnackbar.
+  ///
+  /// In pl, this message translates to:
+  /// **'Link do resetowania hasła został wysłany na Twój e-mail'**
+  String get passwordResetSentSnackbar;
+
+  /// No description provided for @emailEmptyError.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wprowadź swój adres e-mail'**
+  String get emailEmptyError;
+
+  /// No description provided for @resetPasswordDialogTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odzyskiwanie hasła'**
+  String get resetPasswordDialogTitle;
+
+  /// No description provided for @resetPasswordDialogBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyślemy link do zresetowania hasła na Twój adres e-mail.'**
+  String get resetPasswordDialogBody;
+
+  /// No description provided for @resetPasswordConfirmButtonLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyślij link'**
+  String get resetPasswordConfirmButtonLabel;
 
   /// No description provided for @accountSecuredSnackbar.
   ///

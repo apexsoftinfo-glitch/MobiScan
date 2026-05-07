@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:image/image.dart' as img;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -75,12 +76,23 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
         final targetPath = p.join(appDocDir.path, fileName);
         
         try {
-          // Temporarily revert to direct copy to fix the "gray square" issue
-          // while we investigate the best way to process images safely.
-          await File(sourcePath).copy(targetPath);
+          final bytes = await File(sourcePath).readAsBytes();
+          final image = img.decodeImage(bytes);
+
+          if (image != null) {
+            // Boost contrast to make small details more visible (1.3 is a healthy boost)
+            final adjusted = img.contrast(image, contrast: 1.3);
+            
+            // Encode back as JPG with high quality
+            final processedBytes = img.encodeJpg(adjusted, quality: 90);
+            await File(targetPath).writeAsBytes(processedBytes);
+            debugPrint('✅ [DocumentScannerCubit] contrast applied to page $i');
+          } else {
+            await File(sourcePath).copy(targetPath);
+          }
         } catch (e) {
-          debugPrint('❌ [DocumentScannerCubit] copy error: $e');
-          // Try to copy anyway or handle error
+          debugPrint('❌ [DocumentScannerCubit] processing error: $e');
+          // Fallback to copy if processing fails
           if (await File(sourcePath).exists()) {
             await File(sourcePath).copy(targetPath);
           }

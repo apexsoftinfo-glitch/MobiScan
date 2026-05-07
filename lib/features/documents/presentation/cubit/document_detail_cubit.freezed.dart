@@ -12,11 +12,17 @@ part of 'document_detail_cubit.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$DocumentDetailState {
+mixin _$DocumentDetailState implements DiagnosticableTreeMixin {
 
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentDetailState'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -28,7 +34,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentDetailState()';
 }
 
@@ -186,7 +192,7 @@ return error(_that.errorKey);case _:
 /// @nodoc
 
 
-class Initial implements DocumentDetailState {
+class Initial with DiagnosticableTreeMixin implements DocumentDetailState {
   const Initial();
   
 
@@ -194,6 +200,12 @@ class Initial implements DocumentDetailState {
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentDetailState.initial'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -205,7 +217,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentDetailState.initial()';
 }
 
@@ -218,7 +230,7 @@ String toString() {
 /// @nodoc
 
 
-class Loading implements DocumentDetailState {
+class Loading with DiagnosticableTreeMixin implements DocumentDetailState {
   const Loading();
   
 
@@ -226,6 +238,12 @@ class Loading implements DocumentDetailState {
 
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentDetailState.loading'))
+    ;
+}
 
 @override
 bool operator ==(Object other) {
@@ -237,7 +255,7 @@ bool operator ==(Object other) {
 int get hashCode => runtimeType.hashCode;
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentDetailState.loading()';
 }
 
@@ -250,7 +268,7 @@ String toString() {
 /// @nodoc
 
 
-class Success implements DocumentDetailState {
+class Success with DiagnosticableTreeMixin implements DocumentDetailState {
   const Success({this.successKey, this.newName});
   
 
@@ -264,6 +282,12 @@ class Success implements DocumentDetailState {
 $SuccessCopyWith<Success> get copyWith => _$SuccessCopyWithImpl<Success>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentDetailState.success'))
+    ..add(DiagnosticsProperty('successKey', successKey))..add(DiagnosticsProperty('newName', newName));
+}
 
 @override
 bool operator ==(Object other) {
@@ -275,7 +299,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,successKey,newName);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentDetailState.success(successKey: $successKey, newName: $newName)';
 }
 
@@ -318,7 +342,7 @@ as String?,
 /// @nodoc
 
 
-class Error implements DocumentDetailState {
+class Error with DiagnosticableTreeMixin implements DocumentDetailState {
   const Error({required this.errorKey});
   
 
@@ -331,6 +355,12 @@ class Error implements DocumentDetailState {
 $ErrorCopyWith<Error> get copyWith => _$ErrorCopyWithImpl<Error>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'DocumentDetailState.error'))
+    ..add(DiagnosticsProperty('errorKey', errorKey));
+}
 
 @override
 bool operator ==(Object other) {
@@ -342,7 +372,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,errorKey);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'DocumentDetailState.error(errorKey: $errorKey)';
 }
 

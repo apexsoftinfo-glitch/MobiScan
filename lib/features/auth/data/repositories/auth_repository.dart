@@ -24,6 +24,8 @@ abstract class AuthRepository {
   Future<void> deleteAccount();
 
   Future<void> signOut();
+  Future<void> updatePassword(String newPassword);
+  Future<void> sendPasswordResetEmail(String email);
 }
 
 @LazySingleton(as: AuthRepository)
@@ -116,6 +118,30 @@ class AuthRepositoryImpl implements AuthRepository {
       debugPrint('✅ [AuthRepository] signOut succeeded');
     } catch (error) {
       debugPrint('❌ [AuthRepository] signOut error: $error');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) async {
+    try {
+      debugPrint('ℹ️ [AuthRepository] updatePassword started');
+      await _authDataSource.updatePassword(newPassword);
+      debugPrint('✅ [AuthRepository] updatePassword succeeded');
+    } catch (error) {
+      debugPrint('❌ [AuthRepository] updatePassword error: $error');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      debugPrint('ℹ️ [AuthRepository] sendPasswordResetEmail started email=$email');
+      await _authDataSource.sendPasswordResetEmail(email);
+      debugPrint('✅ [AuthRepository] sendPasswordResetEmail succeeded email=$email');
+    } catch (error) {
+      debugPrint('❌ [AuthRepository] sendPasswordResetEmail error: $error');
       rethrow;
     }
   }

@@ -12,6 +12,7 @@ part 'login_cubit.freezed.dart';
 sealed class LoginState with _$LoginState {
   const factory LoginState.initial({
     @Default(false) bool isLoading,
+    @Default(false) bool isResetSent,
     String? errorKey,
   }) = LoginStateData;
 }
@@ -37,5 +38,27 @@ class LoginCubit extends Cubit<LoginState> {
       debugPrint('❌ [LoginCubit] login error: $error');
       emit(state.copyWith(isLoading: false, errorKey: mapErrorToKey(error)));
     }
+  }
+
+  Future<void> sendPasswordReset(String email) async {
+    if (state.isLoading) return;
+    if (email.trim().isEmpty) {
+      emit(state.copyWith(errorKey: 'email_empty'));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, errorKey: null, isResetSent: false));
+
+    try {
+      await _authRepository.sendPasswordResetEmail(email.trim());
+      emit(state.copyWith(isLoading: false, isResetSent: true));
+    } catch (error) {
+      debugPrint('❌ [LoginCubit] sendPasswordReset error: $error');
+      emit(state.copyWith(isLoading: false, errorKey: mapErrorToKey(error)));
+    }
+  }
+
+  void clearResetStatus() {
+    emit(state.copyWith(isResetSent: false, errorKey: null));
   }
 }

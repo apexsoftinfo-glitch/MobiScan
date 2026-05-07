@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:archive/archive_io.dart';
 import 'package:injectable/injectable.dart';
 import 'package:path/path.dart' as p;
@@ -51,16 +52,28 @@ class BackupRepositoryImpl implements BackupRepository {
     final encoder = ZipFileEncoder();
     encoder.create(zipPath);
     
-    // Add metadata.json
-    await encoder.addFile(metadataFile);
+    // Add metadata.json at root
+    await encoder.addFile(metadataFile, 'metadata.json');
     
-    // Add images directory
-    await encoder.addDirectory(imagesDir);
+    // Add images at root/images/
+    final images = imagesDir.listSync();
+    for (final item in images) {
+      if (item is File) {
+        final filename = p.basename(item.path);
+        await encoder.addFile(item, 'images/$filename');
+      }
+    }
     
     encoder.close();
 
     // Clean up temp dir
-    await backupDir.delete(recursive: true);
+    try {
+      if (await backupDir.exists()) {
+        await backupDir.delete(recursive: true);
+      }
+    } catch (e) {
+      debugPrint('⚠️ [BackupRepository] temp cleanup error: $e');
+    }
 
     return zipPath;
   }
@@ -118,9 +131,15 @@ class BackupRepositoryImpl implements BackupRepository {
       throw Exception('Invalid backup: metadata.json not found');
     }
 
-    final content = await metadataFile.readAsString();
-    final List<dynamic> json = jsonDecode(content);
-    final docs = json.map((j) => DocumentModel.fromJson(j as Map<String, dynamic>)).toList();
+    final List<DocumentModel> docs;
+    try {
+      final content = await metadataFile.readAsString();
+      final List<dynamic> json = jsonDecode(content);
+      docs = json.map((j) => DocumentModel.fromJson(j as Map<String, dynamic>)).toList();
+    } catch (e) {
+      debugPrint('❌ [BackupRepository] decode error: $e');
+      throw Exception('Corrupted backup data');
+    }
 
     // 3. Restore files and records
     final appDocDir = await getApplicationDocumentsDirectory();

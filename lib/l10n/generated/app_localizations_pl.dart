@@ -188,6 +188,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get proEnabledSnackbar => 'Pro aktywowane';
 
   @override
+  String get passwordUpdatedSnackbar => 'Hasło zostało zmienione';
+
+  @override
   String get profileTitle => 'Profil';
 
   @override
@@ -195,6 +198,39 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get saveFirstNameButtonLabel => 'Zapisz imię';
+
+  @override
+  String get changePasswordButtonLabel => 'Zmień hasło';
+
+  @override
+  String get newPasswordFieldLabel => 'Nowe hasło';
+
+  @override
+  String get changePasswordDialogTitle => 'Zmień hasło';
+
+  @override
+  String get changePasswordDialogBody =>
+      'Wprowadź nowe hasło dla swojego konta.';
+
+  @override
+  String get forgotPasswordButtonLabel => 'Zapomniałeś hasła?';
+
+  @override
+  String get passwordResetSentSnackbar =>
+      'Link do resetowania hasła został wysłany na Twój e-mail';
+
+  @override
+  String get emailEmptyError => 'Wprowadź swój adres e-mail';
+
+  @override
+  String get resetPasswordDialogTitle => 'Odzyskiwanie hasła';
+
+  @override
+  String get resetPasswordDialogBody =>
+      'Wyślemy link do zresetowania hasła na Twój adres e-mail.';
+
+  @override
+  String get resetPasswordConfirmButtonLabel => 'Wyślij link';
 
   @override
   String get accountSecuredSnackbar => 'Konto zabezpieczone';

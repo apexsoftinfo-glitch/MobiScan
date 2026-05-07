@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LoginState implements DiagnosticableTreeMixin {
 
- bool get isLoading; String? get errorKey;
+ bool get isLoading; bool get isResetSent; String? get errorKey;
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,21 +26,21 @@ $LoginStateCopyWith<LoginState> get copyWith => _$LoginStateCopyWithImpl<LoginSt
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'LoginState'))
-    ..add(DiagnosticsProperty('isLoading', isLoading))..add(DiagnosticsProperty('errorKey', errorKey));
+    ..add(DiagnosticsProperty('isLoading', isLoading))..add(DiagnosticsProperty('isResetSent', isResetSent))..add(DiagnosticsProperty('errorKey', errorKey));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorKey, errorKey) || other.errorKey == errorKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isResetSent, isResetSent) || other.isResetSent == isResetSent)&&(identical(other.errorKey, errorKey) || other.errorKey == errorKey));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLoading,errorKey);
+int get hashCode => Object.hash(runtimeType,isLoading,isResetSent,errorKey);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'LoginState(isLoading: $isLoading, errorKey: $errorKey)';
+  return 'LoginState(isLoading: $isLoading, isResetSent: $isResetSent, errorKey: $errorKey)';
 }
 
 
@@ -51,7 +51,7 @@ abstract mixin class $LoginStateCopyWith<$Res>  {
   factory $LoginStateCopyWith(LoginState value, $Res Function(LoginState) _then) = _$LoginStateCopyWithImpl;
 @useResult
 $Res call({
- bool isLoading, String? errorKey
+ bool isLoading, bool isResetSent, String? errorKey
 });
 
 
@@ -68,9 +68,10 @@ class _$LoginStateCopyWithImpl<$Res>
 
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isLoading = null,Object? errorKey = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isLoading = null,Object? isResetSent = null,Object? errorKey = freezed,}) {
   return _then(_self.copyWith(
 isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,isResetSent: null == isResetSent ? _self.isResetSent : isResetSent // ignore: cast_nullable_to_non_nullable
 as bool,errorKey: freezed == errorKey ? _self.errorKey : errorKey // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -154,10 +155,10 @@ return initial(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( bool isLoading,  String? errorKey)?  initial,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( bool isLoading,  bool isResetSent,  String? errorKey)?  initial,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case LoginStateData() when initial != null:
-return initial(_that.isLoading,_that.errorKey);case _:
+return initial(_that.isLoading,_that.isResetSent,_that.errorKey);case _:
   return orElse();
 
 }
@@ -175,10 +176,10 @@ return initial(_that.isLoading,_that.errorKey);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( bool isLoading,  String? errorKey)  initial,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( bool isLoading,  bool isResetSent,  String? errorKey)  initial,}) {final _that = this;
 switch (_that) {
 case LoginStateData():
-return initial(_that.isLoading,_that.errorKey);}
+return initial(_that.isLoading,_that.isResetSent,_that.errorKey);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -192,10 +193,10 @@ return initial(_that.isLoading,_that.errorKey);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( bool isLoading,  String? errorKey)?  initial,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( bool isLoading,  bool isResetSent,  String? errorKey)?  initial,}) {final _that = this;
 switch (_that) {
 case LoginStateData() when initial != null:
-return initial(_that.isLoading,_that.errorKey);case _:
+return initial(_that.isLoading,_that.isResetSent,_that.errorKey);case _:
   return null;
 
 }
@@ -207,10 +208,11 @@ return initial(_that.isLoading,_that.errorKey);case _:
 
 
 class LoginStateData with DiagnosticableTreeMixin implements LoginState {
-  const LoginStateData({this.isLoading = false, this.errorKey});
+  const LoginStateData({this.isLoading = false, this.isResetSent = false, this.errorKey});
   
 
 @override@JsonKey() final  bool isLoading;
+@override@JsonKey() final  bool isResetSent;
 @override final  String? errorKey;
 
 /// Create a copy of LoginState
@@ -224,21 +226,21 @@ $LoginStateDataCopyWith<LoginStateData> get copyWith => _$LoginStateDataCopyWith
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'LoginState.initial'))
-    ..add(DiagnosticsProperty('isLoading', isLoading))..add(DiagnosticsProperty('errorKey', errorKey));
+    ..add(DiagnosticsProperty('isLoading', isLoading))..add(DiagnosticsProperty('isResetSent', isResetSent))..add(DiagnosticsProperty('errorKey', errorKey));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginStateData&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorKey, errorKey) || other.errorKey == errorKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginStateData&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isResetSent, isResetSent) || other.isResetSent == isResetSent)&&(identical(other.errorKey, errorKey) || other.errorKey == errorKey));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLoading,errorKey);
+int get hashCode => Object.hash(runtimeType,isLoading,isResetSent,errorKey);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'LoginState.initial(isLoading: $isLoading, errorKey: $errorKey)';
+  return 'LoginState.initial(isLoading: $isLoading, isResetSent: $isResetSent, errorKey: $errorKey)';
 }
 
 
@@ -249,7 +251,7 @@ abstract mixin class $LoginStateDataCopyWith<$Res> implements $LoginStateCopyWit
   factory $LoginStateDataCopyWith(LoginStateData value, $Res Function(LoginStateData) _then) = _$LoginStateDataCopyWithImpl;
 @override @useResult
 $Res call({
- bool isLoading, String? errorKey
+ bool isLoading, bool isResetSent, String? errorKey
 });
 
 
@@ -266,9 +268,10 @@ class _$LoginStateDataCopyWithImpl<$Res>
 
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isLoading = null,Object? errorKey = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isLoading = null,Object? isResetSent = null,Object? errorKey = freezed,}) {
   return _then(LoginStateData(
 isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,isResetSent: null == isResetSent ? _self.isResetSent : isResetSent // ignore: cast_nullable_to_non_nullable
 as bool,errorKey: freezed == errorKey ? _self.errorKey : errorKey // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
