@@ -548,15 +548,7 @@ class _PageThumbnail extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   file.existsSync()
-                      ? ColorFiltered(
-                          colorFilter: const ColorFilter.matrix([
-                            1.2, 0, 0, 0, -25.6,
-                            0, 1.2, 0, 0, -25.6,
-                            0, 0, 1.2, 0, -25.6,
-                            0, 0, 0, 1, 0,
-                          ]),
-                          child: Image.file(file, fit: BoxFit.cover),
-                        )
+                      ? Image.file(file, fit: BoxFit.cover)
                       : Container(
                           color: theme.cardTheme.color,
                           child: Icon(Icons.broken_image_outlined,
@@ -640,17 +632,9 @@ class _FullscreenImageViewerState extends State<_FullscreenImageViewer> {
                       minScale: 0.5,
                       maxScale: 4.0,
                       child: Center(
-                        child: ColorFiltered(
-                          colorFilter: const ColorFilter.matrix([
-                            1.2, 0, 0, 0, -25.6,
-                            0, 1.2, 0, 0, -25.6,
-                            0, 0, 1.2, 0, -25.6,
-                            0, 0, 0, 1, 0,
-                          ]),
-                          child: Image.file(
-                            File(snapshot.data!),
-                            fit: BoxFit.contain,
-                          ),
+                        child: Image.file(
+                          File(snapshot.data!),
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),

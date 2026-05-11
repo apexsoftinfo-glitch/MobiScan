@@ -70,15 +70,7 @@ class DocumentThumbnail extends StatelessWidget {
                     ),
                   ),
                   child: imageExists
-                      ? ColorFiltered(
-                          colorFilter: const ColorFilter.matrix([
-                            1.2, 0, 0, 0, -25.6,
-                            0, 1.2, 0, 0, -25.6,
-                            0, 0, 1.2, 0, -25.6,
-                            0, 0, 0, 1, 0,
-                          ]),
-                          child: Image.file(file, fit: BoxFit.cover),
-                        )
+                      ? Image.file(file, fit: BoxFit.cover)
                       : Icon(
                           Icons.article_outlined,
                           size: size * 0.5,

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:image/image.dart' as img;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -76,26 +75,12 @@ class DocumentScannerCubit extends Cubit<DocumentScannerState> {
         final targetPath = p.join(appDocDir.path, fileName);
         
         try {
-          final bytes = await File(sourcePath).readAsBytes();
-          final image = img.decodeImage(bytes);
-
-          if (image != null) {
-            // Boost contrast to make small details more visible (1.3 is a healthy boost)
-            final adjusted = img.contrast(image, contrast: 1.3);
-            
-            // Encode back as JPG with high quality
-            final processedBytes = img.encodeJpg(adjusted, quality: 90);
-            await File(targetPath).writeAsBytes(processedBytes);
-            debugPrint('✅ [DocumentScannerCubit] contrast applied to page $i');
-          } else {
-            await File(sourcePath).copy(targetPath);
-          }
+          // Just copy the file from the scanner to our storage
+          // This is much faster and avoids memory issues or corruption during processing
+          await File(sourcePath).copy(targetPath);
+          debugPrint('✅ [DocumentScannerCubit] page $i copied to storage');
         } catch (e) {
-          debugPrint('❌ [DocumentScannerCubit] processing error: $e');
-          // Fallback to copy if processing fails
-          if (await File(sourcePath).exists()) {
-            await File(sourcePath).copy(targetPath);
-          }
+          debugPrint('❌ [DocumentScannerCubit] copy error: $e');
         }
 
         await _documentRepository.addPage(
