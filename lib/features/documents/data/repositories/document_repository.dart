@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
 import '../../models/document_model.dart';
@@ -24,9 +26,18 @@ class DocumentRepositoryImpl implements DocumentRepository {
   final DocumentDataSource _dataSource;
   final BehaviorSubject<List<DocumentModel>> _documentsSubject = BehaviorSubject();
   List<DocumentModel> _lastDocuments = [];
+  StreamSubscription? _subscription;
+  String? _activeUserId;
 
   @override
   Stream<List<DocumentModel>> watchDocuments(String userId) {
+    if (_activeUserId == userId && _subscription != null) {
+      return _documentsSubject.stream;
+    }
+
+    _subscription?.cancel();
+    _activeUserId = userId;
+
     // Optimized stream join: One stream for all documents, one for all pages.
     final rawStream = CombineLatestStream.combine2<List<Map<String, dynamic>>,
         List<Map<String, dynamic>>, List<DocumentModel>>(
@@ -48,7 +59,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     // Pipe results to our subject for repository-wide state
-    rawStream.listen((docs) {
+    _subscription = rawStream.listen((docs) {
       _lastDocuments = docs;
       _documentsSubject.add(docs);
     });
