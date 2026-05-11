@@ -81,7 +81,16 @@ class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<void> deleteDocument(String id) async {
-    await _dataSource.deleteDocument(id);
+    // Optimistic delete: remove from cache immediately
+    _lastDocuments = _lastDocuments.where((doc) => doc.id != id).toList();
+    _documentsSubject.add(_lastDocuments);
+
+    try {
+      await _dataSource.deleteDocument(id);
+    } catch (e) {
+      debugPrint('❌ [DocumentRepository] Delete error: $e');
+      rethrow;
+    }
   }
 
   @override
@@ -99,7 +108,20 @@ class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<void> deletePage(String id) async {
-    await _dataSource.deletePage(id);
+    // Optimistic delete: remove the page from the local document cache
+    _lastDocuments = _lastDocuments.map((doc) {
+      return doc.copyWith(
+        pages: doc.pages.where((p) => p.id != id).toList(),
+      );
+    }).toList();
+    _documentsSubject.add(_lastDocuments);
+
+    try {
+      await _dataSource.deletePage(id);
+    } catch (e) {
+      debugPrint('❌ [DocumentRepository] Delete page error: $e');
+      rethrow;
+    }
   }
 
   @override
