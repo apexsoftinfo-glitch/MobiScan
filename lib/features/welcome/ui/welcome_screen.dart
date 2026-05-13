@@ -6,6 +6,7 @@ import '../../../core/di/injection.dart';
 import '../../../l10n/l10n.dart';
 import '../../../shared/error_messages.dart';
 import '../../auth/presentation/cubit/welcome_cubit.dart';
+import '../../../core/design/app_design_system.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -46,13 +47,17 @@ class _WelcomeView extends StatelessWidget {
                         Text(
                           l10n.welcomeTitle,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineMedium,
+                          style: AppDesignSystem.headline(context),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           l10n.welcomeBody,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            height: 1.5,
+                          ),
                         ),
                         if (state.errorKey != null) ...[
                           const SizedBox(height: 24),
@@ -82,10 +87,13 @@ class _WelcomeView extends StatelessWidget {
                               : Text(l10n.continueAsGuestButtonLabel),
                         ),
                         const SizedBox(height: 12),
-                        OutlinedButton(
+                        TextButton(
                           onPressed: state.isLoading
                               ? null
                               : () => AppNavigator.goToLogin(context),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
                           child: Text(l10n.loginButtonLabel),
                         ),
                       ],
@@ -106,23 +114,28 @@ class _WelcomeAppIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final platform = Theme.of(context).platform;
-    final image = Image.asset(
-      'assets/images/icon/icon.png',
-      width: 88,
-      height: 88,
-      fit: BoxFit.cover,
-    );
-
     return Center(
-      child: switch (platform) {
-        TargetPlatform.android => ClipOval(child: image),
-        TargetPlatform.iOS => ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: image,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
-        _ => ClipRRect(borderRadius: BorderRadius.circular(20), child: image),
-      },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Image.asset(
+            'assets/images/icon/icon.png',
+            width: 100,
+            height: 100,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
     );
   }
 }

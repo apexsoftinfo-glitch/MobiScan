@@ -540,5 +540,134 @@ class AppLocalizationsPl extends AppLocalizations {
   String get backupFailedMessage => 'Błąd podczas tworzenia kopii zapasowej.';
 
   @override
+  String get settingsLanguage => 'Język';
+
+  @override
+  String get settingsBackupHowItWorks => 'JAK DZIAŁA?';
+
+  @override
+  String get settingsBackupHowItWorksBody =>
+      'Kopia zapasowa służy do bezpiecznego przeniesienia wszystkich Twoich danych i obrazów skanów na inny telefon.';
+
+  @override
+  String get settingsDataInfoTitle => 'INFORMACJA O DANYCH';
+
+  @override
+  String get settingsDataInfoPrivacyTitle => 'Prywatność';
+
+  @override
+  String get settingsDataInfoPrivacyBody =>
+      'Twoje fizyczne skany nie opuszczają urządzenia bez Twojej wiedzy (np. dopóki ich nie udostępnisz jako PDF).';
+
+  @override
+  String get settingsDataInfoNoSyncTitle => 'Brak synchronizacji';
+
+  @override
+  String get settingsDataInfoNoSyncBody =>
+      'Jeśli zalogujesz się na innym telefonie, zobaczysz listę skanów, ale nie będziesz mógł podejrzeć obrazów, ponieważ pliki źródłowe zostały na pierwszym telefonie.';
+
+  @override
+  String get settingsDataInfoRiskTitle => 'Ryzyko utraty';
+
+  @override
+  String get settingsDataInfoRiskBody =>
+      'Jeśli odinstalujesz aplikację lub wyczyścisz dane, Twoje skany zostaną bezpowrotnie usunięte (chyba że masz kopię zapasową całego telefonu).';
+
+  @override
+  String get settingsOtherSection => 'POZOSTAŁE';
+
+  @override
+  String get settingsAboutApp => 'O aplikacji';
+
+  @override
+  String get settingsAboutAppBody =>
+      'Profesjonalne narzędzie do skanowania i zarządzania dokumentami PDF bezpośrednio na Twoim telefonie.';
+
+  @override
+  String get backupSubject => 'MobiScan Backup';
+
+  @override
+  String get backupText => 'Moja kopia zapasowa MobiScan';
+
+  @override
+  String get sortLatest => 'Najnowsze';
+
+  @override
+  String get sortOldest => 'Najstarsze';
+
+  @override
+  String get sortNameAZ => 'Nazwa A-Z';
+
+  @override
+  String get sortNameZA => 'Nazwa Z-A';
+
+  @override
+  String get noSearchResultsTitle => 'BRAK WYNIKÓW';
+
+  @override
+  String get noSearchResultsBody =>
+      'Nie znaleźliśmy skanów pasujących do Twojego zapytania.';
+
+  @override
+  String get pageCountAbbreviation => 'str';
+
+  @override
+  String get deleteButtonLabel => 'Usuń';
+
+  @override
+  String get errorTechnicalDifficulties =>
+      'Problemy techniczne. Spróbuj ponownie później.';
+
+  @override
+  String get okButtonLabel => 'OK';
+
+  @override
+  String get profileSectionAccount => 'TWOJE KONTO';
+
+  @override
+  String get profileSectionOther => 'POZOSTAŁE';
+
+  @override
+  String get profileSecureDataSubtitle => 'Zabezpiecz swoje dane';
+
+  @override
+  String get profileTemporaryAccountLabel => 'KONTO TYMCZASOWE';
+
+  @override
+  String get profileGuestUserLabel => 'Użytkownik Gość';
+
+  @override
   String get restoreFailedMessage => 'Błąd podczas przywracania danych.';
+
+  @override
+  String dashboardGreetingName(Object firstName) {
+    return 'Witaj, $firstName! 👋';
+  }
+
+  @override
+  String get dashboardWelcomeBack => 'Witaj ponownie w MobiScan';
+
+  @override
+  String get dashboardNewScan => 'Nowy skan';
+
+  @override
+  String get dashboardCaptureDocument => 'Zeskanuj dokument';
+
+  @override
+  String get dashboardScanWithCamera => 'Skanuj aparatem';
+
+  @override
+  String get dashboardStartScanning => 'Rozpocznij skanowanie';
+
+  @override
+  String get dashboardRecentDocuments => 'Ostatnie dokumenty';
+
+  @override
+  String get navHome => 'Start';
+
+  @override
+  String get navLibrary => 'Moje skany';
+
+  @override
+  String get navCloud => 'Chmura';
 }

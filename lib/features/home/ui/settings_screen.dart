@@ -8,6 +8,7 @@ import '../../../app/session/presentation/cubit/session_cubit.dart';
 import '../../../core/di/injection.dart';
 import '../../settings/presentation/cubit/backup_cubit.dart';
 import '../../../l10n/l10n.dart';
+import '../../../core/design/app_design_system.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -45,9 +46,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: messenger.clearMaterialBanners,
-            child: const Text(
-              'OK',
-              style: TextStyle(
+            child: Text(
+              context.l10n.okButtonLabel.toUpperCase(),
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
               ),
@@ -62,6 +63,77 @@ class _SettingsScreenState extends State<SettingsScreen> {
         messenger.clearMaterialBanners();
       }
     });
+  }
+
+  void _showLanguageDialog(BuildContext context) {
+    final l10n = context.l10n;
+    final cubit = context.read<ThemeCubit>();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: const RoundedRectangleBorder(),
+        title: Text(
+          l10n.settingsLanguage.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _DialogActionTile(
+              icon: Icons.brightness_auto_outlined,
+              label: 'System',
+              onTap: () {
+                cubit.setLocale(null);
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            _DialogActionTile(
+              icon: Icons.language,
+              label: 'Polski',
+              onTap: () {
+                cubit.setLocale(const Locale('pl'));
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            _DialogActionTile(
+              icon: Icons.language,
+              label: 'English',
+              onTap: () {
+                cubit.setLocale(const Locale('en'));
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            _DialogActionTile(
+              icon: Icons.language,
+              label: 'Русский',
+              onTap: () {
+                cubit.setLocale(const Locale('ru'));
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            _DialogActionTile(
+              icon: Icons.language,
+              label: 'ქართული',
+              onTap: () {
+                cubit.setLocale(const Locale('ka'));
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n.cancelButtonLabel.toUpperCase()),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -80,8 +152,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             Share.shareXFiles(
               [XFile(state.zipPath)],
-              subject: 'MobiScan Backup',
-              text: 'Moja kopia zapasowa MobiScan',
+              subject: l10n.backupSubject,
+              text: l10n.backupText,
               sharePositionOrigin: origin,
             );
 
@@ -105,54 +177,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
               backgroundColor: theme.scaffoldBackgroundColor,
               appBar: AppBar(
                 title: Text(
-                  l10n.settingsTitle.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 3,
-                    color: theme.colorScheme.onSurface,
-                  ),
+                  l10n.settingsTitle,
+                  style: AppDesignSystem.headline(context),
                 ),
                 backgroundColor: theme.scaffoldBackgroundColor,
                 scrolledUnderElevation: 0,
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(1),
-                  child: Divider(height: 1, color: theme.dividerColor),
-                ),
+                centerTitle: true,
               ),
               body: SafeArea(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      _SettingsTile(
-                        icon: Icons.person_outline,
-                        label: l10n.settingsProfile,
-                        onTap: () => AppNavigator.goToProfile(context),
-                      ),
-                      BlocBuilder<ThemeCubit, ThemeState>(
-                        builder: (context, state) {
-                          final isDark = state.themeMode == ThemeMode.dark;
-                          return _SettingsSwitchTile(
-                            icon: isDark
-                                ? Icons.dark_mode_outlined
-                                : Icons.light_mode_outlined,
-                            label: l10n.settingsDarkMode,
-                            value: isDark,
-                            onChanged: (value) {
-                              context.read<ThemeCubit>().setThemeMode(
-                                    value ? ThemeMode.dark : ThemeMode.light,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        child: Container(
+                          decoration: AppDesignSystem.cardDecoration(),
+                          child: Column(
+                            children: [
+                              _SettingsTile(
+                                icon: Icons.person_outline,
+                                label: l10n.settingsProfile,
+                                onTap: () => AppNavigator.goToProfile(context),
+                                isFirst: true,
+                              ),
+                              BlocBuilder<ThemeCubit, ThemeState>(
+                                builder: (context, state) {
+                                  final currentLocale = state.locale;
+                                  String languageName = 'System';
+                                  if (currentLocale?.languageCode == 'pl') languageName = 'Polski';
+                                  if (currentLocale?.languageCode == 'en') languageName = 'English';
+                                  if (currentLocale?.languageCode == 'ru') languageName = 'Русский';
+                                  if (currentLocale?.languageCode == 'ka') languageName = 'ქართული';
+
+                                  return _SettingsTile(
+                                    icon: Icons.language_outlined,
+                                    label: l10n.settingsLanguage,
+                                    trailingText: languageName,
+                                    onTap: () => _showLanguageDialog(context),
                                   );
-                            },
-                          );
-                        },
+                                },
+                              ),
+                              const _BackupTile(isLast: true),
+                            ],
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 12),
                       _InfoSection(),
-                      const SizedBox(height: 32),
-                      const _BackupTile(), // Changed from _BackupSection
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
                       _AboutSection(),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 48),
                     ],
                   ),
                 ),
@@ -177,7 +251,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 }
 
 class _BackupTile extends StatelessWidget {
-  const _BackupTile();
+  const _BackupTile({this.isLast = false});
+
+  final bool isLast;
 
   @override
   Widget build(BuildContext context) {
@@ -187,12 +263,13 @@ class _BackupTile extends StatelessWidget {
     return _SettingsTile(
       // We still use GlobalKey for sharePositionOrigin on iPad
       key: (context.findAncestorStateOfType<_SettingsScreenState>())?._backupTileKey,
-      icon: Icons.history_edu_outlined, // Thematic icon: history/documents/backup
-      label: l10n.settingsBackupSection.toUpperCase(),
+      icon: Icons.history_edu_outlined,
+      label: l10n.settingsBackupSection,
       onTap: () {
         if (userId == null) return;
         _showBackupOptions(context, userId);
       },
+      isLast: isLast,
     );
   }
 
@@ -231,9 +308,9 @@ class _BackupTile extends StatelessWidget {
               },
             ),
             const Divider(height: 16),
-            const Text(
-              'JAK DZIAŁA?',
-              style: TextStyle(
+            Text(
+              l10n.settingsBackupHowItWorks,
+              style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.5,
@@ -241,9 +318,9 @@ class _BackupTile extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Kopia zapasowa służy do bezpiecznego przeniesienia wszystkich Twoich danych i obrazów skanów na inny telefon.',
-              style: TextStyle(fontSize: 13, height: 1.5, color: Colors.grey),
+            Text(
+              l10n.settingsBackupHowItWorksBody,
+              style: const TextStyle(fontSize: 13, height: 1.5, color: Colors.grey),
             ),
           ],
         ),
@@ -300,53 +377,52 @@ class _InfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 3,
-                height: 14,
-                color: theme.colorScheme.onSurface,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'INFORMACJA O DANYCH',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 2.5,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
-              ),
-            ],
+          Text(
+            l10n.settingsDataInfoTitle,
+            style: AppDesignSystem.label().copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
           ),
           const SizedBox(height: 16),
-          _InfoItem(
-            icon: Icons.shield_outlined,
-            iconColor: const Color(0xFF0D9488),
-            title: 'Prywatność',
-            body:
-                'Twoje fizyczne skany nie opuszczają urządzenia bez Twojej wiedzy (np. dopóki ich nie udostępnisz jako PDF).',
-          ),
-          const SizedBox(height: 12),
-          _InfoItem(
-            icon: Icons.sync_disabled_outlined,
-            iconColor: const Color(0xFFF97316),
-            title: 'Brak synchronizacji',
-            body:
-                'Jeśli zalogujesz się na innym telefonie, zobaczysz listę skanów, ale nie będziesz mógł podejrzeć obrazów, ponieważ pliki źródłowe zostały na pierwszym telefonie.',
-          ),
-          const SizedBox(height: 12),
-          _InfoItem(
-            icon: Icons.warning_amber_outlined,
-            iconColor: const Color(0xFFEF4444),
-            title: 'Ryzyko utraty',
-            body:
-                'Jeśli odinstalujesz aplikację lub wyczyścisz dane, Twoje skany zostaną bezpowrotnie usunięte (chyba że masz kopię zapasową całego telefonu).',
+          Container(
+            decoration: AppDesignSystem.cardDecoration(),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                _InfoItem(
+                  icon: Icons.shield_outlined,
+                  iconColor: const Color(0xFF00B894),
+                  title: l10n.settingsDataInfoPrivacyTitle,
+                  body: l10n.settingsDataInfoPrivacyBody,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Divider(height: 1, color: Color(0xFFF1F2F6)),
+                ),
+                _InfoItem(
+                  icon: Icons.sync_disabled_outlined,
+                  iconColor: const Color(0xFFFAB1A0),
+                  title: l10n.settingsDataInfoNoSyncTitle,
+                  body: l10n.settingsDataInfoNoSyncBody,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Divider(height: 1, color: Color(0xFFF1F2F6)),
+                ),
+                _InfoItem(
+                  icon: Icons.warning_amber_outlined,
+                  iconColor: const Color(0xFFFF7675),
+                  title: l10n.settingsDataInfoRiskTitle,
+                  body: l10n.settingsDataInfoRiskBody,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -417,12 +493,18 @@ class _SettingsTile extends StatelessWidget {
     super.key,
     required this.icon,
     required this.label,
+    this.trailingText,
     this.onTap,
+    this.isFirst = false,
+    this.isLast = false,
   });
 
   final IconData icon;
   final String label;
+  final String? trailingText;
   final VoidCallback? onTap;
+  final bool isFirst;
+  final bool isLast;
 
   @override
   Widget build(BuildContext context) {
@@ -432,33 +514,61 @@ class _SettingsTile extends StatelessWidget {
       children: [
         InkWell(
           onTap: onTap,
+          borderRadius: BorderRadius.vertical(
+            top: isFirst ? const Radius.circular(32) : Radius.zero,
+            bottom: isLast ? const Radius.circular(32) : Radius.zero,
+          ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
             child: Row(
               children: [
-                Icon(icon, size: 22, color: theme.colorScheme.onSurface),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, size: 20, color: theme.colorScheme.onSurface),
+                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
                     label,
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
                       color: theme.colorScheme.onSurface,
+                      letterSpacing: -0.3,
                     ),
                   ),
                 ),
-                if (onTap != null)
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 16,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                if (trailingText != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Text(
+                      trailingText!,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                ),
               ],
             ),
           ),
         ),
-        Divider(height: 1, color: theme.dividerColor, indent: 20, endIndent: 20),
+        if (!isLast)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Divider(height: 1, color: Color(0xFFF1F2F6)),
+          ),
       ],
     );
   }
@@ -469,33 +579,30 @@ class _AboutSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-          child: Row(
-            children: [
-              Container(width: 3, height: 14, color: theme.colorScheme.onSurface),
-              const SizedBox(width: 10),
-              Text(
-                'POZOSTAŁE',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 2.5,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.settingsOtherSection,
+            style: AppDesignSystem.label().copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
           ),
-        ),
-        _SettingsTile(
-          icon: Icons.info_outline,
-          label: 'O aplikacji',
-          onTap: () => _showAboutDialog(context),
-        ),
-      ],
+          const SizedBox(height: 12),
+          Container(
+            decoration: AppDesignSystem.cardDecoration(),
+            child: _SettingsTile(
+              icon: Icons.info_outline,
+              label: context.l10n.settingsAboutApp,
+              onTap: () => _showAboutDialog(context),
+              isFirst: true,
+              isLast: true,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -516,9 +623,9 @@ class _AboutSection extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Profesjonalne narzędzie do skanowania i zarządzania dokumentami PDF bezpośrednio na Twoim telefonie.',
-              style: TextStyle(fontSize: 14, height: 1.5),
+            Text(
+              context.l10n.settingsAboutAppBody,
+              style: const TextStyle(fontSize: 14, height: 1.5),
             ),
             const SizedBox(height: 20),
             Row(
@@ -553,7 +660,7 @@ class _AboutSection extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('ZAMKNIJ'),
+            child: Text(context.l10n.closeButtonLabel.toUpperCase()),
           ),
         ],
       ),
@@ -561,51 +668,3 @@ class _AboutSection extends StatelessWidget {
   }
 }
 
-class _SettingsSwitchTile extends StatelessWidget {
-  const _SettingsSwitchTile({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Row(
-            children: [
-              Icon(icon, size: 22, color: theme.colorScheme.onSurface),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              Switch.adaptive(
-                value: value,
-                onChanged: onChanged,
-                activeThumbColor: theme.colorScheme.onSurface,
-              ),
-            ],
-          ),
-        ),
-        Divider(height: 1, color: theme.dividerColor, indent: 20, endIndent: 20),
-      ],
-    );
-  }
-}

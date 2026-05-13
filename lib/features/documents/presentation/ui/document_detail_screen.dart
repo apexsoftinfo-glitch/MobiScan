@@ -58,9 +58,9 @@ class DocumentDetailScreen extends StatelessWidget {
                         actions: [
                           TextButton(
                             onPressed: messenger.clearMaterialBanners,
-                            child: const Text(
-                              'OK',
-                              style: TextStyle(
+                            child: Text(
+                              context.l10n.okButtonLabel.toUpperCase(),
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -249,7 +249,7 @@ class _DocumentDetailView extends StatelessWidget {
               Navigator.pop(diagContext);
             },
             child: Text(
-              'Usuń',
+              l10n.deleteButtonLabel,
               style: TextStyle(color: Colors.red.shade600, fontWeight: FontWeight.bold),
             ),
           ),

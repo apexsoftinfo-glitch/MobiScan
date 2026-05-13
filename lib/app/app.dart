@@ -30,6 +30,7 @@ class App extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: state.locale,
             themeMode: state.themeMode,
             theme: _buildLightTheme(),
             darkTheme: _buildDarkTheme(),
@@ -44,58 +45,59 @@ class App extends StatelessWidget {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: const Color(0xFFF2F0EB),
+      scaffoldBackgroundColor: const Color(0xFFFDFCF9),
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF111111),
+        seedColor: const Color(0xFF00B894),
         brightness: Brightness.light,
         surface: const Color(0xFFFFFFFF),
-        primary: const Color(0xFF111111),
+        primary: const Color(0xFF00B894),
         onPrimary: const Color(0xFFFFFFFF),
-        secondary: const Color(0xFF444444),
+        secondary: const Color(0xFF636E72),
         onSecondary: const Color(0xFFFFFFFF),
-        error: const Color(0xFFB00020),
+        error: const Color(0xFFEF4444),
         onError: const Color(0xFFFFFFFF),
-        onSurface: const Color(0xFF111111),
+        onSurface: const Color(0xFF2D3436),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFFF2F0EB),
+        backgroundColor: Color(0xFFFDFCF9),
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
-          fontSize: 18,
+          fontSize: 22,
           fontWeight: FontWeight.w800,
-          color: Color(0xFF111111),
-          letterSpacing: -0.3,
+          color: Color(0xFF2D3436),
+          letterSpacing: -0.5,
         ),
-        iconTheme: IconThemeData(color: Color(0xFF111111)),
+        iconTheme: IconThemeData(color: Color(0xFF2D3436)),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: WidgetStatePropertyAll(Color(0xFF111111)),
-          foregroundColor: WidgetStatePropertyAll(Color(0xFFFFFFFF)),
+          backgroundColor: const WidgetStatePropertyAll(Color(0xFF00B894)),
+          foregroundColor: const WidgetStatePropertyAll(Color(0xFFFFFFFF)),
+          padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 24, vertical: 16)),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
           ),
-          elevation: WidgetStatePropertyAll(0),
+          elevation: const WidgetStatePropertyAll(0),
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Color(0xFFFFFFFF),
-        selectedItemColor: Color(0xFF111111),
-        unselectedItemColor: Color(0xFF9E9E9E),
+        selectedItemColor: Color(0xFF00B894),
+        unselectedItemColor: Color(0xFFB2BEC3),
         type: BottomNavigationBarType.fixed,
-        elevation: 0,
-        selectedLabelStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+        elevation: 8,
+        selectedLabelStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.2),
         unselectedLabelStyle: TextStyle(fontSize: 11),
       ),
-      dividerColor: const Color(0xFFD0CFC9),
-      cardTheme: const CardThemeData(
-        color: Color(0xFFFFFFFF),
+      dividerColor: const Color(0xFFF1F2F6),
+      cardTheme: CardThemeData(
+        color: const Color(0xFFFFFFFF),
         elevation: 0,
+        margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-          side: BorderSide(color: Color(0xFFD0CFC9), width: 1.5),
+          borderRadius: BorderRadius.circular(32),
         ),
       ),
     );
@@ -222,11 +224,13 @@ class _AppShellState extends State<_AppShell> {
       );
     } else {
       if (AppConfig.isReleaseMode) {
-        return const Scaffold(
-          body: Center(
-            child: Text('Technical difficulties. Please try again later.'),
+      return Scaffold(
+        body: Center(
+          child: Builder(
+            builder: (context) => Text(context.l10n.errorTechnicalDifficulties),
           ),
-        );
+        ),
+      );
       }
       return const MissingSupabaseKeysScreen();
     }

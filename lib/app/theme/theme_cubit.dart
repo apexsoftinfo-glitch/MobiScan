@@ -10,28 +10,49 @@ part 'theme_cubit.freezed.dart';
 sealed class ThemeState with _$ThemeState {
   const factory ThemeState.initial({
     required ThemeMode themeMode,
+    Locale? locale,
   }) = Initial;
 }
 
 @lazySingleton
 class ThemeCubit extends Cubit<ThemeState> {
   ThemeCubit(this._prefs) : super(const ThemeState.initial(themeMode: ThemeMode.system)) {
-    _loadTheme();
+    _loadSettings();
   }
 
   final SharedPreferences _prefs;
   static const _themeKey = 'theme_mode';
+  static const _localeKey = 'locale_code';
 
-  void _loadTheme() {
-    final index = _prefs.getInt(_themeKey);
-    if (index != null && index < ThemeMode.values.length) {
-      emit(ThemeState.initial(themeMode: ThemeMode.values[index]));
+  void _loadSettings() {
+    final themeIndex = _prefs.getInt(_themeKey);
+    final localeCode = _prefs.getString(_localeKey);
+    
+    ThemeMode mode = ThemeMode.system;
+    if (themeIndex != null && themeIndex < ThemeMode.values.length) {
+      mode = ThemeMode.values[themeIndex];
     }
+
+    Locale? locale;
+    if (localeCode != null) {
+      locale = Locale(localeCode);
+    }
+
+    emit(ThemeState.initial(themeMode: mode, locale: locale));
   }
 
   void setThemeMode(ThemeMode mode) {
-    emit(ThemeState.initial(themeMode: mode));
+    emit(state.copyWith(themeMode: mode));
     _prefs.setInt(_themeKey, mode.index);
+  }
+
+  void setLocale(Locale? locale) {
+    emit(state.copyWith(locale: locale));
+    if (locale == null) {
+      _prefs.remove(_localeKey);
+    } else {
+      _prefs.setString(_localeKey, locale.languageCode);
+    }
   }
 
   void toggleTheme() {

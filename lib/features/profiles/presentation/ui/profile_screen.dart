@@ -8,6 +8,7 @@ import '../../../../core/di/injection.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../shared/error_messages.dart';
 import '../cubit/profile_cubit.dart';
+import '../../../../core/design/app_design_system.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -77,9 +78,9 @@ class _ProfileViewState extends State<_ProfileView> {
         actions: [
           TextButton(
             onPressed: messenger.clearMaterialBanners,
-            child: const Text(
-              'OK',
-              style: TextStyle(
+            child: Text(
+              context.l10n.okButtonLabel.toUpperCase(),
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
               ),
@@ -150,21 +151,12 @@ class _ProfileViewState extends State<_ProfileView> {
             backgroundColor: theme.scaffoldBackgroundColor,
             appBar: AppBar(
               title: Text(
-                l10n.profileTitle.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 3,
-                  color: theme.colorScheme.onSurface,
-                ),
+                l10n.profileTitle,
+                style: AppDesignSystem.headline(context),
               ),
-              centerTitle: false,
+              centerTitle: true,
               backgroundColor: theme.scaffoldBackgroundColor,
               scrolledUnderElevation: 0,
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(1),
-                child: Divider(height: 1, color: theme.dividerColor),
-              ),
             ),
             body: SafeArea(
               child: BlocBuilder<ProfileCubit, ProfileState>(
@@ -182,75 +174,113 @@ class _ProfileViewState extends State<_ProfileView> {
                               session: session,
                               isUpdating: isSavingName,
                             ),
-                            _sectionLabel(context, 'TWOJE KONTO'),
-                            _NameField(
-                              controller: _firstNameController,
-                              focusNode: _firstNameFocusNode,
-                              enabled: !isSavingName && activeAction == null,
-                              hasChanges: _hasUnsavedChanges(firstName),
-                              isSaving: isSavingName,
-                              onSave: () => _saveFirstName(context, session),
+                            const SizedBox(height: 24),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                l10n.profileSectionAccount,
+                                style: AppDesignSystem.label().copyWith(
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                ),
+                              ),
                             ),
-                            if (session.isAnonymousUser) ...[
-                              _ProfileActionTile(
-                                enabled: !isSavingName && activeAction == null,
-                                icon: Icons.security,
-                                title: l10n.registerButtonLabel,
-                                subtitle: 'Zabezpiecz swoje dane',
-                                isPrimary: true,
-                                onTap: () async {
-                                  final r = await AppNavigator.goToRegister(context);
-                                  if (r == true && context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(l10n.accountSecuredSnackbar),
+                            const SizedBox(height: 12),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Container(
+                                decoration: AppDesignSystem.cardDecoration(),
+                                child: Column(
+                                  children: [
+                                    _NameField(
+                                      controller: _firstNameController,
+                                      focusNode: _firstNameFocusNode,
+                                      enabled: !isSavingName && activeAction == null,
+                                      hasChanges: _hasUnsavedChanges(firstName),
+                                      isSaving: isSavingName,
+                                      onSave: () => _saveFirstName(context, session),
+                                    ),
+                                    if (session.isAnonymousUser) ...[
+                                      _ProfileActionTile(
+                                        enabled: !isSavingName && activeAction == null,
+                                        icon: Icons.security,
+                                        title: l10n.registerButtonLabel,
+                                        subtitle: l10n.profileSecureDataSubtitle,
+                                        isPrimary: true,
+                                        onTap: () async {
+                                          final r = await AppNavigator.goToRegister(context);
+                                          if (r == true && context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(l10n.accountSecuredSnackbar),
+                                              ),
+                                            );
+                                          }
+                                        },
                                       ),
-                                    );
-                                  }
-                                },
+                                      _ProfileActionTile(
+                                        enabled: !isSavingName && activeAction == null,
+                                        icon: Icons.login,
+                                        title: l10n.loginButtonLabel,
+                                        onTap: () => AppNavigator.goToLogin(context),
+                                        isLast: true,
+                                      ),
+                                    ],
+                                    if (!session.isAnonymousUser) ...[
+                                      _ProfileActionTile(
+                                        enabled: !isSavingName && activeAction == null,
+                                        icon: Icons.lock_outline,
+                                        title: l10n.changePasswordButtonLabel,
+                                        trailing: activeAction ==
+                                                AccountAction.updatePassword
+                                            ? const _Spinner()
+                                            : null,
+                                        onTap: () => _showChangePasswordDialog(context),
+                                      ),
+                                      _ProfileActionTile(
+                                        enabled: !isSavingName && activeAction == null,
+                                        icon: Icons.logout,
+                                        title: l10n.logoutButtonLabel,
+                                        trailing: activeAction == AccountAction.signOut
+                                            ? const _Spinner()
+                                            : null,
+                                        onTap: () => context
+                                            .read<AccountActionsCubit>()
+                                            .signOut(),
+                                        isLast: true,
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
-                              _ProfileActionTile(
-                                enabled: !isSavingName && activeAction == null,
-                                icon: Icons.login,
-                                title: l10n.loginButtonLabel,
-                                onTap: () => AppNavigator.goToLogin(context),
+                            ),
+                            const SizedBox(height: 24),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                l10n.profileSectionOther,
+                                style: AppDesignSystem.label().copyWith(
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                ),
                               ),
-                            ],
-                            if (!session.isAnonymousUser) ...[
-                              _ProfileActionTile(
-                                enabled: !isSavingName && activeAction == null,
-                                icon: Icons.lock_outline,
-                                title: l10n.changePasswordButtonLabel,
-                                trailing: activeAction ==
-                                        AccountAction.updatePassword
-                                    ? const _Spinner()
-                                    : null,
-                                onTap: () => _showChangePasswordDialog(context),
+                            ),
+                            const SizedBox(height: 12),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Container(
+                                decoration: AppDesignSystem.cardDecoration(),
+                                child: _ProfileActionTile(
+                                  enabled: !isSavingName && activeAction == null,
+                                  icon: Icons.delete_outline,
+                                  title: l10n.deleteAccountButtonLabel,
+                                  isDestructive: true,
+                                  isLast: true,
+                                  trailing:
+                                      activeAction == AccountAction.deleteAccount
+                                          ? const _Spinner()
+                                          : null,
+                                  onTap: () => _confirmDeleteAccount(context),
+                                ),
                               ),
-                              _ProfileActionTile(
-                                enabled: !isSavingName && activeAction == null,
-                                icon: Icons.logout,
-                                title: l10n.logoutButtonLabel,
-                                trailing: activeAction == AccountAction.signOut
-                                    ? const _Spinner()
-                                    : null,
-                                onTap: () => context
-                                    .read<AccountActionsCubit>()
-                                    .signOut(),
-                              ),
-                            ],
-                            const SizedBox(height: 8),
-                            _sectionLabel(context, 'POZOSTAŁE'),
-                            _ProfileActionTile(
-                              enabled: !isSavingName && activeAction == null,
-                              icon: Icons.delete_outline,
-                              title: l10n.deleteAccountButtonLabel,
-                              isDestructive: true,
-                              trailing:
-                                  activeAction == AccountAction.deleteAccount
-                                      ? const _Spinner()
-                                      : null,
-                              onTap: () => _confirmDeleteAccount(context),
                             ),
                             if (profileState.errorKey != null ||
                                 accountState.errorKey != null)
@@ -269,7 +299,7 @@ class _ProfileViewState extends State<_ProfileView> {
                                   ),
                                 ),
                               ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 48),
                           ],
                         ),
                       );
@@ -284,27 +314,6 @@ class _ProfileViewState extends State<_ProfileView> {
     );
   }
 
-  Widget _sectionLabel(BuildContext context, String text) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-      child: Row(
-        children: [
-          Container(width: 3, height: 12, color: theme.colorScheme.onSurface),
-          const SizedBox(width: 10),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 2.5,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   bool _hasUnsavedChanges(String firstName) {
     return _firstNameController.text.trim() != firstName.trim();
@@ -442,68 +451,88 @@ class _ProfileHeaderBlock extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: theme.dividerColor, width: 1),
-        ),
-      ),
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
       child: Row(
         children: [
-          // Monogram square
           Stack(
             children: [
               Container(
-                width: 72,
-                height: 72,
-                color: theme.colorScheme.onSurface,
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppDesignSystem.accent,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppDesignSystem.accent.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
                 child: Center(
                   child: Text(
                     initials,
-                    style: TextStyle(
-                      fontSize: 28,
+                    style: const TextStyle(
+                      fontSize: 32,
                       fontWeight: FontWeight.w900,
-                      color: theme.scaffoldBackgroundColor,
+                      color: Colors.white,
                       letterSpacing: -1,
                     ),
                   ),
                 ),
               ),
               if (isUpdating)
-                const Positioned.fill(
-                  child: Center(
-                    child: SizedBox(
-                      width: 72,
-                      height: 72,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
             ],
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  session.emailOrNull ?? 'Użytkownik Gość',
+                  session.emailOrNull ?? context.l10n.profileGuestUserLabel,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
                     color: theme.colorScheme.onSurface,
+                    letterSpacing: -0.5,
                   ),
                 ),
                 if (session.isAnonymousUser)
                   Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Text(
-                      'KONTO TYMCZASOWE',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 2,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        context.l10n.profileTemporaryAccountLabel,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        ),
                       ),
                     ),
                   ),
@@ -540,13 +569,14 @@ class _NameField extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = context.l10n;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           TextField(
             controller: controller,
             focusNode: focusNode,
             enabled: enabled,
+            style: const TextStyle(fontWeight: FontWeight.w600),
             decoration: InputDecoration(
               labelText: l10n.firstNameFieldLabel,
               prefixIcon: Icon(
@@ -554,30 +584,36 @@ class _NameField extends StatelessWidget {
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
+                borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(color: theme.dividerColor, width: 1.5),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
+                borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(color: theme.dividerColor, width: 1.5),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
+                borderRadius: BorderRadius.circular(16),
                 borderSide:
-                    BorderSide(color: theme.colorScheme.onSurface, width: 1.5),
+                    BorderSide(color: AppDesignSystem.accent, width: 2),
               ),
               filled: true,
-              fillColor: theme.cardTheme.color,
+              fillColor: theme.colorScheme.onSurface.withValues(alpha: 0.02),
             ),
             onSubmitted: (_) => onSave(),
           ),
           if (hasChanges)
             Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: 16),
               child: SizedBox(
                 width: double.infinity,
+                height: 52,
                 child: FilledButton(
                   onPressed: !isSaving ? onSave : null,
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
                   child: isSaving
                       ? const _Spinner()
                       : Text(l10n.saveFirstNameButtonLabel),
@@ -601,6 +637,7 @@ class _ProfileActionTile extends StatelessWidget {
     this.subtitle,
     this.isDestructive = false,
     this.isPrimary = false,
+    this.isLast = false,
     this.trailing,
   });
 
@@ -611,6 +648,7 @@ class _ProfileActionTile extends StatelessWidget {
   final bool enabled;
   final bool isDestructive;
   final bool isPrimary;
+  final bool isLast;
   final Widget? trailing;
 
   @override
@@ -624,26 +662,29 @@ class _ProfileActionTile extends StatelessWidget {
       children: [
         InkWell(
           onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.vertical(
+            bottom: isLast ? const Radius.circular(32) : Radius.zero,
+          ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
             child: Row(
               children: [
-                // Left border accent for primary actions
-                if (isPrimary)
-                  Container(
-                    width: 3,
-                    height: 32,
-                    color: theme.colorScheme.onSurface,
-                    margin: const EdgeInsets.only(right: 12),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: isDestructive
+                        ? theme.colorScheme.error.withValues(alpha: 0.1)
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
                   ),
-                Icon(
-                  icon,
-                  size: 22,
-                  color: enabled
-                      ? color
-                      : color.withValues(alpha: 0.35),
+                  child: Icon(
+                    icon,
+                    size: 20,
+                    color: enabled ? color : color.withValues(alpha: 0.35),
+                  ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -651,11 +692,10 @@ class _ProfileActionTile extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: enabled
-                              ? color
-                              : color.withValues(alpha: 0.35),
+                          color: enabled ? color : color.withValues(alpha: 0.35),
+                          letterSpacing: -0.3,
                         ),
                       ),
                       if (subtitle != null)
@@ -671,15 +711,19 @@ class _ProfileActionTile extends StatelessWidget {
                 ),
                 trailing ??
                     Icon(
-                      Icons.arrow_forward,
-                      size: 16,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                     ),
               ],
             ),
           ),
         ),
-        Divider(height: 1, color: theme.dividerColor, indent: 20, endIndent: 20),
+        if (!isLast)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Divider(height: 1, color: Color(0xFFF1F2F6)),
+          ),
       ],
     );
   }

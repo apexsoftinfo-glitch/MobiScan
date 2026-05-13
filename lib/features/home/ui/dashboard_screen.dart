@@ -4,11 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/design/app_design_system.dart';
 import '../../../l10n/l10n.dart';
 import '../../../app/navigation/app_navigator.dart';
-import 'dart:ui';
 import '../../documents/presentation/cubit/document_list_cubit.dart' as list_cubit;
 import '../../documents/presentation/cubit/document_scanner_cubit.dart' as scanner_cubit;
 import '../../documents/presentation/ui/widgets/document_thumbnail.dart';
 import '../../documents/models/document_model.dart';
+
+import '../../../app/session/presentation/cubit/session_cubit.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key, required this.userId});
@@ -18,32 +19,59 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _GreetingSection(l10n: l10n),
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _StatsRow(l10n: l10n),
+      backgroundColor: AppDesignSystem.background,
+      body: Stack(
+        children: [
+          // Background blobs
+          Positioned(
+            top: -100,
+            right: -50,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                color: AppDesignSystem.mintLight.withValues(alpha: 0.3),
+                shape: BoxShape.circle,
               ),
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _ScanButton(userId: userId, l10n: l10n),
+              child: BackdropFilter(
+                filter: ColorFilter.mode(
+                  AppDesignSystem.background.withValues(alpha: 0.1),
+                  BlendMode.dstATop,
+                ),
+                child: Container(),
               ),
-              const SizedBox(height: 32),
-              _RecentScansSection(l10n: l10n, userId: userId),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            top: 200,
+            left: -100,
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                color: AppDesignSystem.orangeLight.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _GreetingSection(l10n: l10n),
+                  const SizedBox(height: 12),
+                  _ScanCard(userId: userId, l10n: l10n),
+                  const SizedBox(height: 32),
+                  _RecentScansSection(l10n: l10n, userId: userId),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -59,30 +87,60 @@ class _GreetingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            l10n.dashboardGreeting,
-            style: TextStyle(
-              fontSize: 42,
-              fontWeight: FontWeight.w900,
-              color: theme.colorScheme.onSurface,
-              letterSpacing: -2,
-              height: 1.0,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BlocBuilder<SessionCubit, SessionState>(
+                  builder: (context, state) {
+                    final firstName = state.sharedUserOrNull?.firstName ?? l10n.guestDisplayName;
+                    return Text(
+                      l10n.dashboardGreetingName(firstName),
+                      style: AppDesignSystem.headline(context).copyWith(
+                        fontSize: 28,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  },
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.dashboardWelcomeBack,
+                  style: AppDesignSystem.body(context).copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppDesignSystem.textSecondary.withValues(alpha: 0.6),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.dashboardGreetingSubtitle.toUpperCase(),
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 2.5,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+          const SizedBox(width: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Badge(
+              backgroundColor: AppDesignSystem.accent,
+              smallSize: 8,
+              child: Icon(Icons.notifications_none_rounded, size: 24),
             ),
           ),
         ],
@@ -91,77 +149,20 @@ class _GreetingSection extends StatelessWidget {
   }
 }
 
-// ─── Stats ────────────────────────────────────────────────────────────────
-
-class _StatsRow extends StatelessWidget {
-  const _StatsRow({required this.l10n});
-
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return BlocBuilder<list_cubit.DocumentListCubit, list_cubit.DocumentListState>(
-      builder: (context, state) {
-        final count = state is list_cubit.Success ? state.documents.length : 0;
-        return Container(
-          decoration: AppDesignSystem.accentLeftBorder(
-            bg: theme.cardTheme.color,
-          ),
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$count',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -2,
-                      color: theme.colorScheme.onSurface,
-                      height: 1.0,
-                    ),
-                  ),
-                  Text(
-                    l10n.dashboardTotalScans.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 20),
-              Icon(
-                Icons.description_outlined,
-                size: 36,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
 
 // ─── Scan button ──────────────────────────────────────────────────────────
 
-class _ScanButton extends StatefulWidget {
-  const _ScanButton({required this.userId, required this.l10n});
+class _ScanCard extends StatefulWidget {
+  const _ScanCard({required this.userId, required this.l10n});
 
   final String userId;
   final AppLocalizations l10n;
 
   @override
-  State<_ScanButton> createState() => _ScanButtonState();
+  State<_ScanCard> createState() => _ScanCardState();
 }
 
-class _ScanButtonState extends State<_ScanButton>
+class _ScanCardState extends State<_ScanCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -190,97 +191,124 @@ class _ScanButtonState extends State<_ScanButton>
     return BlocBuilder<scanner_cubit.DocumentScannerCubit,
         scanner_cubit.DocumentScannerState>(
       builder: (context, state) {
-        final isSaving = state is scanner_cubit.Saving;
-        final isScanning = state is scanner_cubit.Scanning;
-        final isLoading = isSaving || isScanning;
+        final isLoading = state is scanner_cubit.Saving || state is scanner_cubit.Scanning;
 
-        return AnimatedBuilder(
-          animation: _animation,
-          builder: (context, child) {
-            final glowValue = _animation.value;
-            return GestureDetector(
-              onTap: isLoading
-                  ? null
-                  : () => context
-                      .read<scanner_cubit.DocumentScannerCubit>()
-                      .startScan(widget.userId),
-              child: Transform.scale(
-                scale: 1.0 + (glowValue * 0.02),
-                child: Container(
-                  width: double.infinity,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF6366F1).withValues(
-                          alpha: 0.2 + (glowValue * 0.3),
-                        ),
-                        blurRadius: 15 + (glowValue * 15),
-                        spreadRadius: 2 + (glowValue * 4),
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Container(
+            padding: const EdgeInsets.all(32),
+            decoration: AppDesignSystem.cardDecoration(
+              borderRadius: BorderRadius.circular(48),
+            ).copyWith(
+              gradient: AppDesignSystem.scanCardGradient,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              const Color(0xFF6366F1).withValues(alpha: 0.85),
-                              const Color(0xFF4338CA).withValues(alpha: 0.7),
-                            ],
-                          ),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Center(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (isLoading)
-                                SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              else
-                                Icon(
-                                  Icons.document_scanner_outlined,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              const SizedBox(width: 12),
-                              Text(
-                                isSaving
-                                    ? widget.l10n.savingLabel.toUpperCase()
-                                    : widget.l10n.dashboardStartScan.toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 16,
-                                  letterSpacing: 2,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      child: const Icon(
+                        Icons.document_scanner_outlined,
+                        size: 40,
+                        color: AppDesignSystem.accent,
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.l10n.dashboardNewScan,
+                            style: AppDesignSystem.headline(context).copyWith(
+                              fontSize: 22,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.l10n.dashboardCaptureDocument,
+                            style: AppDesignSystem.body(context).copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppDesignSystem.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            widget.l10n.dashboardScanWithCamera,
+                            style: AppDesignSystem.body(context).copyWith(
+                              fontSize: 13,
+                              color: AppDesignSystem.textSecondary.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            );
-          },
+                const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _animation,
+                      builder: (context, child) {
+                        return GestureDetector(
+                          onTap: isLoading ? null : () => context
+                              .read<scanner_cubit.DocumentScannerCubit>()
+                              .startScan(widget.userId),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                            decoration: BoxDecoration(
+                              color: AppDesignSystem.charcoal,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF00E676).withValues(
+                                    alpha: 0.3 + (0.4 * _animation.value),
+                                  ),
+                                  blurRadius: 10 + (15 * _animation.value),
+                                  spreadRadius: 2 * _animation.value,
+                                  offset: Offset(0, 4 + (4 * _animation.value)),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 20),
+                                const SizedBox(width: 10),
+                                Text(
+                                  widget.l10n.dashboardStartScanning,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -297,7 +325,6 @@ class _RecentScansSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return BlocBuilder<list_cubit.DocumentListCubit, list_cubit.DocumentListState>(
       builder: (context, state) {
         if (state is! list_cubit.Success || state.documents.isEmpty) {
@@ -308,19 +335,19 @@ class _RecentScansSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
               child: Text(
-                l10n.dashboardRecentScans.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 2.5,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                l10n.dashboardRecentDocuments,
+                style: AppDesignSystem.headline(context).copyWith(
+                  fontSize: 20,
                 ),
               ),
             ),
             ...recent.map(
-              (doc) => _RecentScanRow(doc: doc),
+              (doc) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: _RecentScanRow(doc: doc),
+              ),
             ),
           ],
         );
@@ -336,55 +363,61 @@ class _RecentScanRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return InkWell(
-      onTap: () => AppNavigator.goToDocumentDetail(context, doc),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: theme.dividerColor,
-              width: 1,
+        decoration: AppDesignSystem.cardDecoration(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => AppNavigator.goToDocumentDetail(context, doc),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                DocumentThumbnail(document: doc, size: 48),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        doc.name,
+                        style: AppDesignSystem.headline(context).copyWith(
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        '${doc.pages.length} pages · ${doc.createdAt.toLocal().toString().substring(0, 10)}',
+                        style: AppDesignSystem.body(context).copyWith(
+                          fontSize: 12,
+                          color: AppDesignSystem.textSecondary.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppDesignSystem.highlight.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'PDF',
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      color: AppDesignSystem.highlight,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        child: Row(
-          children: [
-            DocumentThumbnail(document: doc, size: 48),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    doc.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${doc.pages.length} str  ·  ${doc.createdAt.toLocal().toString().substring(0, 10)}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      letterSpacing: 0.5,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-            ),
-          ],
         ),
       ),
     );

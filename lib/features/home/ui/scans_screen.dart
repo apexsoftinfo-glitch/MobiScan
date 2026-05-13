@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/design/app_design_system.dart';
 
 import '../../../app/navigation/app_navigator.dart';
 import '../../../l10n/l10n.dart';
@@ -146,22 +147,22 @@ class _SortMenu extends StatelessWidget {
             CheckedPopupMenuItem(
               value: list_cubit.DocumentSortOrder.dateDesc,
               checked: currentOrder == list_cubit.DocumentSortOrder.dateDesc,
-              child: const Text('Najnowsze'),
+              child: Text(context.l10n.sortLatest),
             ),
             CheckedPopupMenuItem(
               value: list_cubit.DocumentSortOrder.dateAsc,
               checked: currentOrder == list_cubit.DocumentSortOrder.dateAsc,
-              child: const Text('Najstarsze'),
+              child: Text(context.l10n.sortOldest),
             ),
             CheckedPopupMenuItem(
               value: list_cubit.DocumentSortOrder.nameAsc,
               checked: currentOrder == list_cubit.DocumentSortOrder.nameAsc,
-              child: const Text('Nazwa A-Z'),
+              child: Text(context.l10n.sortNameAZ),
             ),
             CheckedPopupMenuItem(
               value: list_cubit.DocumentSortOrder.nameDesc,
               checked: currentOrder == list_cubit.DocumentSortOrder.nameDesc,
-              child: const Text('Nazwa Z-A'),
+              child: Text(context.l10n.sortNameZA),
             ),
           ],
         );
@@ -192,7 +193,7 @@ class _EmptyScansView extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              isSearch ? 'BRAK WYNIKÓW' : l10n.noScansTitle.toUpperCase(),
+              isSearch ? l10n.noSearchResultsTitle.toUpperCase() : l10n.noScansTitle.toUpperCase(),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
@@ -203,7 +204,7 @@ class _EmptyScansView extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               isSearch
-                  ? 'Nie znaleźliśmy skanów pasujących do Twojego zapytania.'
+                  ? l10n.noSearchResultsBody
                   : l10n.noScansBody,
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -268,12 +269,17 @@ class _ScanRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Column(
-      children: [
-        InkWell(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Container(
+        decoration: AppDesignSystem.cardDecoration(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
           onTap: () => AppNavigator.goToDocumentDetail(context, document),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
                 DocumentThumbnail(document: document, size: 44),
@@ -285,29 +291,29 @@ class _ScanRow extends StatelessWidget {
                       Text(
                         document.name,
                         style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
                           color: theme.colorScheme.onSurface,
+                          letterSpacing: -0.2,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${document.pages.length} str  ·  ${document.createdAt.toLocal().toString().substring(0, 10)}',
-                        style: TextStyle(
+                        '${document.pages.length} ${context.l10n.pageCountAbbreviation}  ·  ${document.createdAt.toLocal().toString().substring(0, 10)}',
+                        style: AppDesignSystem.label().copyWith(
                           fontSize: 11,
-                          letterSpacing: 0.3,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.ios_share,
-                    color: Color(0xFF6366F1), // Vibrant Indigo
+                    color: AppDesignSystem.accent.withValues(alpha: 0.8),
                     size: 20,
                   ),
                   onPressed: () {
@@ -322,17 +328,11 @@ class _ScanRow extends StatelessWidget {
                         );
                   },
                 ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 14,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                ),
               ],
             ),
           ),
         ),
-        Divider(height: 1, color: theme.dividerColor, indent: 20, endIndent: 20),
-      ],
+      ),
     );
   }
 }

@@ -222,7 +222,7 @@ class _DocumentCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${document.pages.length} stron · ${document.createdAt.toLocal().toString().substring(0, 10)}',
+                    '${document.pages.length} ${context.l10n.pageCountAbbreviation} · ${document.createdAt.toLocal().toString().substring(0, 10)}',
                     style: const TextStyle(color: AppDesignSystem.textSecondary, fontSize: 12),
                   ),
                 ],

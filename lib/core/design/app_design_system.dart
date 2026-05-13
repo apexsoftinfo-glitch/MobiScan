@@ -2,68 +2,89 @@ import 'package:flutter/material.dart';
 
 class AppDesignSystem {
   // --- Colors ---
-  static const Color background = Color(0xFFF2F0EB); // warm cream
+  static const Color background = Color(0xFFFDFCF9); 
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color primary = Color(0xFF111111); // near-black
-  static const Color secondary = Color(0xFF444444);
-  static const Color accent = Color(0xFF111111);
+  static const Color primary = Color(0xFF2D3436); 
+  static const Color accent = Color(0xFF00B894); 
+  static const Color mintLight = Color(0xFFA0E8D1);
+  static const Color orangeLight = Color(0xFFFED391);
+  static const Color charcoal = Color(0xFF2D3436);
+  static const Color highlight = Color(0xFFFAB1A0);
 
-  static const Color textPrimary = Color(0xFF111111);
-  static const Color textSecondary = Color(0xFF888888);
-  static const Color outline = Color(0xFFD0CFC9);
-
-  // --- "Gradient" (now a flat black fill) ---
   static const Gradient primaryGradient = LinearGradient(
-    colors: [primary, primary],
+    colors: [Color(0xFF55E6C1), Color(0xFF00B894)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // --- Card decoration (sharp corners, no shadow) ---
+  static const Gradient scanCardGradient = LinearGradient(
+    colors: [Color(0xFFE8F9F3), Color(0xFFFFFFFF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const Color textPrimary = Color(0xFF2D3436);
+  static const Color textSecondary = Color(0xFF636E72);
+
+  // --- Card decoration (Organic, soft shadows, no sharp borders) ---
   static BoxDecoration cardDecoration({
     BorderRadius? borderRadius,
     Color? color,
   }) {
     return BoxDecoration(
       color: color ?? surface,
-      borderRadius: borderRadius ?? BorderRadius.zero,
-      border: Border.all(color: outline, width: 1.5),
+      borderRadius: borderRadius ?? BorderRadius.circular(40),
+      boxShadow: [
+        BoxShadow(
+          color: primary.withValues(alpha: 0.05),
+          blurRadius: 24,
+          offset: const Offset(0, 8),
+        ),
+      ],
     );
   }
 
-  // --- Accent left-border decoration ---
-  static BoxDecoration accentLeftBorder({Color? bg}) {
+  // --- Floating action item decoration ---
+  static BoxDecoration floatingItemDecoration({Color? bg}) {
     return BoxDecoration(
       color: bg ?? surface,
-      border: const Border(
-        left: BorderSide(color: primary, width: 4),
-        top: BorderSide(color: outline, width: 1),
-        right: BorderSide(color: outline, width: 1),
-        bottom: BorderSide(color: outline, width: 1),
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(32),
+        topRight: Radius.circular(12),
+        bottomLeft: Radius.circular(12),
+        bottomRight: Radius.circular(32),
       ),
+      boxShadow: [
+        BoxShadow(
+          color: primary.withValues(alpha: 0.04),
+          blurRadius: 16,
+          offset: const Offset(0, 4),
+        ),
+      ],
     );
   }
 
   // --- Typography ---
-  static TextStyle headline(BuildContext context) => const TextStyle(
+  static TextStyle headline(BuildContext context) => TextStyle(
     color: textPrimary,
-    fontSize: 40,
-    fontWeight: FontWeight.w900,
-    letterSpacing: -1.5,
-    height: 1.0,
+    fontSize: 32,
+    fontWeight: FontWeight.w800,
+    letterSpacing: -0.5,
+    fontFamily: 'Outfit', // Note: User might need to add this to pubspec
   );
 
   static TextStyle body(BuildContext context) => const TextStyle(
     color: textSecondary,
-    fontSize: 14,
-    height: 1.5,
-    letterSpacing: 0.1,
+    fontSize: 15,
+    height: 1.6,
+    letterSpacing: 0.2,
   );
 
   static TextStyle label() => const TextStyle(
     color: textSecondary,
-    fontSize: 11,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 2.0,
+    fontSize: 12,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 1.2,
+    textBaseline: TextBaseline.alphabetic,
   );
 }

@@ -5,7 +5,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_en.dart';
+import 'app_localizations_ka.dart';
 import 'app_localizations_pl.dart';
+import 'app_localizations_ru.dart';
 
 // ignore_for_file: type=lint
 
@@ -92,7 +95,12 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('pl')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('pl'),
+    Locale('en'),
+    Locale('ru'),
+    Locale('ka'),
+  ];
 
   /// Technical placeholder used to bootstrap Flutter localization before migrating existing UI strings.
   ///
@@ -1054,11 +1062,251 @@ abstract class AppLocalizations {
   /// **'Błąd podczas tworzenia kopii zapasowej.'**
   String get backupFailedMessage;
 
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Język'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsBackupHowItWorks.
+  ///
+  /// In pl, this message translates to:
+  /// **'JAK DZIAŁA?'**
+  String get settingsBackupHowItWorks;
+
+  /// No description provided for @settingsBackupHowItWorksBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kopia zapasowa służy do bezpiecznego przeniesienia wszystkich Twoich danych i obrazów skanów na inny telefon.'**
+  String get settingsBackupHowItWorksBody;
+
+  /// No description provided for @settingsDataInfoTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'INFORMACJA O DANYCH'**
+  String get settingsDataInfoTitle;
+
+  /// No description provided for @settingsDataInfoPrivacyTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Prywatność'**
+  String get settingsDataInfoPrivacyTitle;
+
+  /// No description provided for @settingsDataInfoPrivacyBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Twoje fizyczne skany nie opuszczają urządzenia bez Twojej wiedzy (np. dopóki ich nie udostępnisz jako PDF).'**
+  String get settingsDataInfoPrivacyBody;
+
+  /// No description provided for @settingsDataInfoNoSyncTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak synchronizacji'**
+  String get settingsDataInfoNoSyncTitle;
+
+  /// No description provided for @settingsDataInfoNoSyncBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jeśli zalogujesz się na innym telefonie, zobaczysz listę skanów, ale nie będziesz mógł podejrzeć obrazów, ponieważ pliki źródłowe zostały na pierwszym telefonie.'**
+  String get settingsDataInfoNoSyncBody;
+
+  /// No description provided for @settingsDataInfoRiskTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ryzyko utraty'**
+  String get settingsDataInfoRiskTitle;
+
+  /// No description provided for @settingsDataInfoRiskBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jeśli odinstalujesz aplikację lub wyczyścisz dane, Twoje skany zostaną bezpowrotnie usunięte (chyba że masz kopię zapasową całego telefonu).'**
+  String get settingsDataInfoRiskBody;
+
+  /// No description provided for @settingsOtherSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'POZOSTAŁE'**
+  String get settingsOtherSection;
+
+  /// No description provided for @settingsAboutApp.
+  ///
+  /// In pl, this message translates to:
+  /// **'O aplikacji'**
+  String get settingsAboutApp;
+
+  /// No description provided for @settingsAboutAppBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Profesjonalne narzędzie do skanowania i zarządzania dokumentami PDF bezpośrednio na Twoim telefonie.'**
+  String get settingsAboutAppBody;
+
+  /// No description provided for @backupSubject.
+  ///
+  /// In pl, this message translates to:
+  /// **'MobiScan Backup'**
+  String get backupSubject;
+
+  /// No description provided for @backupText.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moja kopia zapasowa MobiScan'**
+  String get backupText;
+
+  /// No description provided for @sortLatest.
+  ///
+  /// In pl, this message translates to:
+  /// **'Najnowsze'**
+  String get sortLatest;
+
+  /// No description provided for @sortOldest.
+  ///
+  /// In pl, this message translates to:
+  /// **'Najstarsze'**
+  String get sortOldest;
+
+  /// No description provided for @sortNameAZ.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nazwa A-Z'**
+  String get sortNameAZ;
+
+  /// No description provided for @sortNameZA.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nazwa Z-A'**
+  String get sortNameZA;
+
+  /// No description provided for @noSearchResultsTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'BRAK WYNIKÓW'**
+  String get noSearchResultsTitle;
+
+  /// No description provided for @noSearchResultsBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie znaleźliśmy skanów pasujących do Twojego zapytania.'**
+  String get noSearchResultsBody;
+
+  /// No description provided for @pageCountAbbreviation.
+  ///
+  /// In pl, this message translates to:
+  /// **'str'**
+  String get pageCountAbbreviation;
+
+  /// No description provided for @deleteButtonLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usuń'**
+  String get deleteButtonLabel;
+
+  /// No description provided for @errorTechnicalDifficulties.
+  ///
+  /// In pl, this message translates to:
+  /// **'Problemy techniczne. Spróbuj ponownie później.'**
+  String get errorTechnicalDifficulties;
+
+  /// No description provided for @okButtonLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'OK'**
+  String get okButtonLabel;
+
+  /// No description provided for @profileSectionAccount.
+  ///
+  /// In pl, this message translates to:
+  /// **'TWOJE KONTO'**
+  String get profileSectionAccount;
+
+  /// No description provided for @profileSectionOther.
+  ///
+  /// In pl, this message translates to:
+  /// **'POZOSTAŁE'**
+  String get profileSectionOther;
+
+  /// No description provided for @profileSecureDataSubtitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zabezpiecz swoje dane'**
+  String get profileSecureDataSubtitle;
+
+  /// No description provided for @profileTemporaryAccountLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'KONTO TYMCZASOWE'**
+  String get profileTemporaryAccountLabel;
+
+  /// No description provided for @profileGuestUserLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Użytkownik Gość'**
+  String get profileGuestUserLabel;
+
   /// No description provided for @restoreFailedMessage.
   ///
   /// In pl, this message translates to:
   /// **'Błąd podczas przywracania danych.'**
   String get restoreFailedMessage;
+
+  /// No description provided for @dashboardGreetingName.
+  ///
+  /// In pl, this message translates to:
+  /// **'Witaj, {firstName}! 👋'**
+  String dashboardGreetingName(Object firstName);
+
+  /// No description provided for @dashboardWelcomeBack.
+  ///
+  /// In pl, this message translates to:
+  /// **'Witaj ponownie w MobiScan'**
+  String get dashboardWelcomeBack;
+
+  /// No description provided for @dashboardNewScan.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nowy skan'**
+  String get dashboardNewScan;
+
+  /// No description provided for @dashboardCaptureDocument.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zeskanuj dokument'**
+  String get dashboardCaptureDocument;
+
+  /// No description provided for @dashboardScanWithCamera.
+  ///
+  /// In pl, this message translates to:
+  /// **'Skanuj aparatem'**
+  String get dashboardScanWithCamera;
+
+  /// No description provided for @dashboardStartScanning.
+  ///
+  /// In pl, this message translates to:
+  /// **'Rozpocznij skanowanie'**
+  String get dashboardStartScanning;
+
+  /// No description provided for @dashboardRecentDocuments.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ostatnie dokumenty'**
+  String get dashboardRecentDocuments;
+
+  /// No description provided for @navHome.
+  ///
+  /// In pl, this message translates to:
+  /// **'Start'**
+  String get navHome;
+
+  /// No description provided for @navLibrary.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moje skany'**
+  String get navLibrary;
+
+  /// No description provided for @navCloud.
+  ///
+  /// In pl, this message translates to:
+  /// **'Chmura'**
+  String get navCloud;
 }
 
 class _AppLocalizationsDelegate
@@ -1072,7 +1320,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['pl'].contains(locale.languageCode);
+      <String>['en', 'ka', 'pl', 'ru'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1081,8 +1329,14 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+    case 'ka':
+      return AppLocalizationsKa();
     case 'pl':
       return AppLocalizationsPl();
+    case 'ru':
+      return AppLocalizationsRu();
   }
 
   throw FlutterError(

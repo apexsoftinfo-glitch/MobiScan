@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ThemeState {
 
- ThemeMode get themeMode;
+ ThemeMode get themeMode; Locale? get locale;
 /// Create a copy of ThemeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ThemeStateCopyWith<ThemeState> get copyWith => _$ThemeStateCopyWithImpl<ThemeSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ThemeState&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ThemeState&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.locale, locale) || other.locale == locale));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,themeMode);
+int get hashCode => Object.hash(runtimeType,themeMode,locale);
 
 @override
 String toString() {
-  return 'ThemeState(themeMode: $themeMode)';
+  return 'ThemeState(themeMode: $themeMode, locale: $locale)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $ThemeStateCopyWith<$Res>  {
   factory $ThemeStateCopyWith(ThemeState value, $Res Function(ThemeState) _then) = _$ThemeStateCopyWithImpl;
 @useResult
 $Res call({
- ThemeMode themeMode
+ ThemeMode themeMode, Locale? locale
 });
 
 
@@ -62,10 +62,11 @@ class _$ThemeStateCopyWithImpl<$Res>
 
 /// Create a copy of ThemeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? themeMode = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? themeMode = null,Object? locale = freezed,}) {
   return _then(_self.copyWith(
 themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
-as ThemeMode,
+as ThemeMode,locale: freezed == locale ? _self.locale : locale // ignore: cast_nullable_to_non_nullable
+as Locale?,
   ));
 }
 
@@ -147,10 +148,10 @@ return initial(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( ThemeMode themeMode)?  initial,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( ThemeMode themeMode,  Locale? locale)?  initial,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case Initial() when initial != null:
-return initial(_that.themeMode);case _:
+return initial(_that.themeMode,_that.locale);case _:
   return orElse();
 
 }
@@ -168,10 +169,10 @@ return initial(_that.themeMode);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( ThemeMode themeMode)  initial,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( ThemeMode themeMode,  Locale? locale)  initial,}) {final _that = this;
 switch (_that) {
 case Initial():
-return initial(_that.themeMode);}
+return initial(_that.themeMode,_that.locale);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -185,10 +186,10 @@ return initial(_that.themeMode);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( ThemeMode themeMode)?  initial,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( ThemeMode themeMode,  Locale? locale)?  initial,}) {final _that = this;
 switch (_that) {
 case Initial() when initial != null:
-return initial(_that.themeMode);case _:
+return initial(_that.themeMode,_that.locale);case _:
   return null;
 
 }
@@ -200,10 +201,11 @@ return initial(_that.themeMode);case _:
 
 
 class Initial implements ThemeState {
-  const Initial({required this.themeMode});
+  const Initial({required this.themeMode, this.locale});
   
 
 @override final  ThemeMode themeMode;
+@override final  Locale? locale;
 
 /// Create a copy of ThemeState
 /// with the given fields replaced by the non-null parameter values.
@@ -215,16 +217,16 @@ $InitialCopyWith<Initial> get copyWith => _$InitialCopyWithImpl<Initial>(this, _
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Initial&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Initial&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.locale, locale) || other.locale == locale));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,themeMode);
+int get hashCode => Object.hash(runtimeType,themeMode,locale);
 
 @override
 String toString() {
-  return 'ThemeState.initial(themeMode: $themeMode)';
+  return 'ThemeState.initial(themeMode: $themeMode, locale: $locale)';
 }
 
 
@@ -235,7 +237,7 @@ abstract mixin class $InitialCopyWith<$Res> implements $ThemeStateCopyWith<$Res>
   factory $InitialCopyWith(Initial value, $Res Function(Initial) _then) = _$InitialCopyWithImpl;
 @override @useResult
 $Res call({
- ThemeMode themeMode
+ ThemeMode themeMode, Locale? locale
 });
 
 
@@ -252,10 +254,11 @@ class _$InitialCopyWithImpl<$Res>
 
 /// Create a copy of ThemeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? themeMode = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? themeMode = null,Object? locale = freezed,}) {
   return _then(Initial(
 themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
-as ThemeMode,
+as ThemeMode,locale: freezed == locale ? _self.locale : locale // ignore: cast_nullable_to_non_nullable
+as Locale?,
   ));
 }
 
