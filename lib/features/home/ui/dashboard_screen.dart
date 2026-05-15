@@ -123,29 +123,10 @@ class _GreetingSection extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 16),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: const Badge(
-              backgroundColor: AppDesignSystem.accent,
-              smallSize: 8,
-              child: Icon(Icons.notifications_none_rounded, size: 24),
-            ),
-          ),
         ],
       ),
     );
+
   }
 }
 

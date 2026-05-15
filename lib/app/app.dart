@@ -31,7 +31,18 @@ class App extends StatelessWidget {
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             locale: state.locale,
+            localeResolutionCallback: (locale, supportedLocales) {
+              if (locale != null) {
+                for (var supportedLocale in supportedLocales) {
+                  if (supportedLocale.languageCode == locale.languageCode) {
+                    return supportedLocale;
+                  }
+                }
+              }
+              return const Locale('en');
+            },
             themeMode: state.themeMode,
+
             theme: _buildLightTheme(),
             darkTheme: _buildDarkTheme(),
             home: _AppShell(hasSupabaseKeys: hasSupabaseKeys),
